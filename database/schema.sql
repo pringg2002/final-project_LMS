@@ -97,3 +97,4 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     INDEX idx_quiz_attempts_user (student_id),
     INDEX idx_quiz_attempts_quiz (quiz_id)
 );
+
