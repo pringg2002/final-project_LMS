@@ -97,3 +97,38 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     INDEX idx_quiz_attempts_user (student_id),
     INDEX idx_quiz_attempts_quiz (quiz_id)
 );
+
+ 
+ CREATE TABLE IF NOT EXISTS enrollments (
+    enrollment_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    enrollment_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
+CREATE TABLE IF NOT EXISTS announcements (
+    announcement_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    course_id INT NOT NULL,
+    author_id INT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    content TEXT NOT NULL,
+    published_at DATETIME NOT NULL,
+    expires_at DATETIME NULL,
+    status ENUM('draft', 'published', 'archived') NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS attempt_answers (
+    answer_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    attempt_id INT NOT NULL,
+    question_id INT NOT NULL,
+    answer_text TEXT NOT NULL,
+    is_correct BOOLEAN NOT NULL,
+    FOREIGN KEY (attempt_id) REFERENCES quiz_attempts(attempt_id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES questions(question_id) ON DELETE CASCADE
+);
+
