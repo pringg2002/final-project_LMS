@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS attempt_answers (
     question_id INT NOT NULL,
     answer_text TEXT NOT NULL,
     is_correct BOOLEAN NOT NULL,
-    FOREIGN KEY (attempt_id) REFERENCES attempts(attempt_id) ON DELETE CASCADE,
+    FOREIGN KEY (attempt_id) REFERENCES quiz_attempts(attempt_id) ON DELETE CASCADE,
     FOREIGN KEY (question_id) REFERENCES questions(question_id) ON DELETE CASCADE
 );
 
