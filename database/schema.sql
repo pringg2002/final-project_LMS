@@ -46,6 +46,46 @@ CREATE TABLE IF NOT EXISTS notifications (
     INDEX idx_notifications_created (created_at)
 );
 
+CREATE TABLE IF NOT EXISTS lessons (
+    lessons_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    course_id INT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    description TEXT,
+    content TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    ON DELETE CASCADE
+
+);
+
+CREATE TABLE IF NOT EXISTS lessons_resources (
+    resource_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    lessons_id INT NOT NULL,
+    resource_name VARCHAR(150) NOT NULL,
+    resource_type ENUM('pdf', 'video', 'document', 'link', 'other') NOT NULL,
+    resource_url VARCHAR(500) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (lessons_id) REFERENCES lessons(lessons_id) ON DELETE CASCADE
+
+);
+
+CREATE TABLE IF NOT EXISTS lessons_progress (
+    progress_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    lessons_id INT NOT NULL,
+    status ENUM('not_started', 'in_progress', 'completed') NOT NULL DEFAULT 'not_started',
+     progress_percentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    progress_percentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    started_at DATETIME NULL,
+    completed_at DATETIME NULL,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (lessons_id) REFERENCES lessons(lessons_id) ON DELETE CASCADE,
+    UNIQUE (user_id, lessons_id)
+
+);
+
 CREATE TABLE IF NOT EXISTS quizzes (
     quiz_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     module_id INT NOT NULL,
