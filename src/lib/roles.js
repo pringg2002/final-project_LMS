@@ -1,7 +1,12 @@
-const ROLES = {
-    ADMIN: "admin",
-    INSTRUCTOR: "instructor",
-    STUDENT: "student"
-};
+const ROLES = Object.freeze({
+  ADMIN: 'admin',
+  INSTRUCTOR: 'instructor',
+  STUDENT: 'student',
+});
 
-module.exports = ROLES;
+const isValidRole = (name) => Object.values(ROLES).includes(name);
+
+module.exports = { 
+  ROLES, 
+  isValidRole 
+};
