@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getAnnouncements, createAnnouncement } = require('../controllers/announcementController');
+const { getAnnouncementsByCourse, createAnnouncement } = require('../controllers/announcementController');
 
-router.get('/', getAnnouncements);
+router.get('/:course_id', getAnnouncementsByCourse);
 router.post('/', createAnnouncement);
 
 module.exports = router;
