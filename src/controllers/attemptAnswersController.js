@@ -1,7 +1,4 @@
-const express = require('express');
-const router = express.Router();
-
-router.get('/:attempt_id', async (req, res) => {
+const getAttemptAnswers = async (req, res) => {
     try {
         const { attempt_id } = req.params;
         const [answers] = await req.db.query(
@@ -13,9 +10,9 @@ router.get('/:attempt_id', async (req, res) => {
         console.error("Error fetching attempt answers:", error);
         res.status(500).json({ success: false, message: "Server error" });
     }
-});
+};
 
-router.post('/', async (req, res) => {
+const createAttemptAnswer = async (req, res) => {
     try {
         const { attempt_id, question_id, answer_text, is_correct } = req.body;
         
@@ -33,6 +30,9 @@ router.post('/', async (req, res) => {
         console.error("Error saving attempt answer:", error);
         res.status(500).json({ success: false, message: "Server error" });
     }
-});
+};
 
-module.exports = router;
+module.exports = {
+    getAttemptAnswers,
+    createAttemptAnswer
+};
