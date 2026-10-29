@@ -1,12 +1,10 @@
-const express = require("express");
+const router = require('express').Router();
+const { success } = require('../utils/response');
 
-const router = express.Router();
+router.get('/health', (req, res) => success(res, null, 'Learning Module API is running'));
 
-router.get("/status", (req, res) => {
-    return res.status(200).json({
-        success: true,
-        message: "Learning Module API is running"
-    });
-});
+router.use('/auth', require('./auth'));
+router.use('/users', require('./user'));
+
 
 module.exports = router;
