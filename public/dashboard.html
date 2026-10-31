@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - Learning Module System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="topbar"></header>
+
+  <main class="container">
+    <section class="card dashboard-hero">
+      <div>
+        <p class="muted" style="margin:0 0 5px">Student Learning Portal</p>
+        <h1 style="margin:0 0 8px">Welcome back, <span id="name"></span>! 👋</h1>
+        <p class="empty" id="email" style="margin:0"></p>
+      </div>
+      <span class="badge" id="role"></span>
+    </section>
+
+    <section class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2>Notifications <span class="badge" id="unread-count">0</span></h2>
+        <button class="secondary" id="read-all">Mark all as read</button>
+      </div>
+      <div id="notifications"><p class="empty">Loading...</p></div>
+    </section>
+
+    <section class="card" id="my-courses">
+      <h2>My courses</h2>
+      <div id="enrollments"><p class="empty">Loading...</p></div>
+    </section>
+
+    <section class="card" id="activity-report" hidden>
+      <h2>Enrollment and activity (LEFT JOIN UNION RIGHT JOIN report)</h2>
+      <div id="activity"></div>
+    </section>
+
+    <section class="card" id="admin-report" hidden>
+      <h2>Users and Roles (INNER JOIN report)</h2>
+      <div id="report"></div>
+    </section>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    requireLogin();
+    const me_role = (getUser() || {}).role;
+
+    const $ = (id) => document.getElementById(id);
+
+    async function loadProfile() {
+      const me = await api('/api/auth/me');
+      $('name').textContent = `${me.first_name} ${me.last_name}`;
+      $('role').textContent = me.role;
+      $('email').textContent = me.email;
+      if (me.role === 'admin' || me.role === 'instructor') { loadReport(); loadActivity(); }
+    }
+
+    async function loadNotifications() {
+      const list = await api('/api/notifications');
+      const unread = list.filter((n) => !n.is_read).length;
+      $('unread-count').textContent = unread;
+      $('notifications').innerHTML = list.length
+        ? list.map((n) => `
+            <div class="notif ${n.is_read ? '' : 'unread'}">
+              <div>${esc(n.title)}<small>${esc(n.message)} · ${new Date(n.created_at).toLocaleString()}</small></div>
+              <div>
+                ${n.is_read ? '' : `<button class="secondary" data-read="${n.notification_id}">Read</button>`}
+                <button class="secondary" data-del="${n.notification_id}">Delete</button>
+              </div>
+            </div>`).join('')
+        : '<p class="empty">No notifications yet.</p>';
+    }
+
+    async function loadReport() {
+      try {
+        const rows = await api('/api/reports/student-roles');
+        $('admin-report').hidden = false;
+        $('report').innerHTML = `<table style="width:100%;border-collapse:collapse">
+          <tr style="text-align:left"><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr>
+          ${rows.map((r) => `<tr><td>${esc(r.full_name)}</td><td>${esc(r.email)}</td>
+            <td><span class="badge">${esc(r.role)}</span></td><td>${esc(r.status)}</td></tr>`).join('')}
+        </table>`;
+      } catch (err) { /* report is optional */ }
+    }
+
+    async function loadEnrollments() {
+      try {
+        const list = (await api('/api/enrollments')).filter((e) => e.status !== 'dropped');
+        $('enrollments').innerHTML = list.length
+          ? list.map((e) => `<div class="notif"><div><a href="courses.html?id=${e.course_id}">${esc(e.course_code)} - ${esc(e.course_name)}</a>
+              <small>${esc(e.status)}${e.student_name && me_role !== 'student' ? ' · ' + esc(e.student_name) : ''}</small></div></div>`).join('')
+          : '<p class="empty">Nothing yet. <a href="courses.html">Browse courses</a> to enroll.</p>';
+      } catch (err) { $('enrollments').innerHTML = `<p class="empty">${esc(err.message)}</p>`; }
+    }
+
+    async function loadActivity() {
+      try {
+        const rows = await api('/api/reports/enrollment-activity');
+        $('activity-report').hidden = false;
+        $('activity').innerHTML = `<table class="list"><tr><th>Student</th><th>Courses</th><th>Quiz attempts</th><th>Source</th></tr>
+          ${rows.map((r) => `<tr><td>${esc(r.student_name)}</td><td>${r.enrolled_courses}</td><td>${r.quiz_attempts}</td><td>${esc(r.record_source)}</td></tr>`).join('')}</table>`;
+      } catch (err) { /* optional */ }
+    }
+
+    $('notifications').addEventListener('click', async (e) => {
+      const read = e.target.dataset.read, del = e.target.dataset.del;
+      try {
+        if (read) await api(`/api/notifications/${read}/read`, { method: 'PUT' });
+        if (del) await api(`/api/notifications/${del}`, { method: 'DELETE' });
+        if (read || del) loadNotifications();
+      } catch (err) { alert(err.message); }
+    });
+
+    $('read-all').addEventListener('click', async () => {
+      try { await api('/api/notifications/read-all', { method: 'PUT' }); loadNotifications(); }
+      catch (err) { alert(err.message); }
+    });
+
+    
+
+    loadProfile().catch((err) => alert(err.message));
+    loadNotifications().catch(() => {});
+    loadEnrollments();
+  </script>
+</body>
+</html>
