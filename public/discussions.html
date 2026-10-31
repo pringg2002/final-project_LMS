@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Discussions - Learning Module System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="topbar"></header>
+  <main class="container">
+    <div class="row between" style="margin-bottom:12px">
+      <h1 id="title" style="margin:0">Discussions</h1>
+      <a id="back" class="btn small secondary" href="courses.html">Back to course</a>
+    </div>
+    <div id="msg" class="msg" role="alert"></div>
+
+    <section class="card">
+      <h2>Start a discussion</h2>
+      <form id="discussion-form" class="stack">
+        <input id="d-title" placeholder="Title" required>
+        <textarea id="d-content" placeholder="What would you like to discuss?" required></textarea>
+        <button type="submit">Post</button>
+      </form>
+    </section>
+    <div id="discussions"></div>
+  </main>
+  <script src="js/app.js"></script>
+  <script src="js/discussions.js"></script>
+</body>
+</html>
