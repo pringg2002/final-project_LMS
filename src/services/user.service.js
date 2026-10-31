@@ -99,7 +99,7 @@ async function update(id, body, actor) {
 
 async function remove(id, actor) {
   if (actor.user_id === id) throw new AppError('You cannot delete your own account', 400);
-  const affected = await userModel.remove(id); // FK in use -> ER_ROW_IS_REFERENCED_2 -> 409
+  const affected = await userModel.remove(id);
   if (!affected) throw new AppError('User not found', 404);
 }
 
