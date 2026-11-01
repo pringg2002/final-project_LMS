@@ -8,7 +8,6 @@ exports.moduleAccess = async (req, res) =>
 exports.courseProgress = async (req, res) =>
   success(res, await adaptiveService.getCourseProgress(req.user, parseId(req.params.courseId, 'courseId')), 'Course progress retrieved successfully');
 
-// ---- instructor override ----
 exports.listUnlocks = async (req, res) =>
   success(res, await adaptiveService.listUnlocks(req.user, parseId(req.params.moduleId, 'moduleId')), 'Unlocks retrieved successfully');
 
