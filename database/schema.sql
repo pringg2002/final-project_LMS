@@ -100,6 +100,7 @@ CREATE TABLE quizzes (
   status ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
+<<<<<<< HEAD
   KEY idx_quizzes_module (module_id),
   CONSTRAINT fk_quizzes_module FOREIGN KEY (module_id) REFERENCES modules (module_id) ON DELETE CASCADE
 );
@@ -305,3 +306,9 @@ CREATE TABLE module_unlocks (
   CONSTRAINT fk_unlocks_student FOREIGN KEY (student_id) REFERENCES users (user_id) ON DELETE CASCADE,
   CONSTRAINT fk_unlocks_teacher FOREIGN KEY (unlocked_by) REFERENCES users (user_id)
 );
+=======
+    INDEX idx_quiz_attempts_user (student_id),
+    INDEX idx_quiz_attempts_quiz (quiz_id)
+);
+
+>>>>>>> ba8688c9ab67fa6c4652eab10accf589347baa6a
