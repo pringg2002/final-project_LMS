@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assignments - Learning Module System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="topbar"></header>
+  <main class="container">
+    <div class="row between" style="margin-bottom:12px">
+      <h1 id="title" style="margin:0">Assignments</h1>
+      <a id="back" class="btn small secondary" href="courses.html">Back to course</a>
+    </div>
+    <div id="msg" class="msg" role="alert"></div>
+
+    <section class="card" id="create-card" hidden>
+      <h2>New assignment</h2>
+      <form id="assignment-form" class="stack">
+        <label for="a-title">Title</label><input id="a-title" required>
+        <label for="a-inst">Instructions</label><textarea id="a-inst"></textarea>
+        <div class="row">
+          <div style="flex:1"><label for="a-due">Due date</label><input id="a-due" type="datetime-local"></div>
+          <div style="flex:1"><label for="a-max">Max score</label><input id="a-max" type="number" min="1" value="100"></div>
+          <div style="flex:1"><label for="a-status">Status</label><select id="a-status"><option value="published">published</option><option value="draft">draft</option><option value="closed">closed</option></select></div>
+        </div>
+        <button type="submit">Create assignment</button>
+      </form>
+    </section>
+
+    <div id="assignments"></div>
+  </main>
+  <script src="js/app.js"></script>
+  <script src="js/assignments.js"></script>
+</body>
+</html>

@@ -1,8 +1,5 @@
-function notFound(req, res) {
-    return res.status(404).json({
-        success: false,
-        message: `Route not found: ${req.method} ${req.originalUrl}`
-    });
-}
+const AppError = require('../utils/AppError');
 
-module.exports = notFound;
+module.exports = (req, res, next) => {
+  next(new AppError(`Route not found: ${req.method} ${req.originalUrl}`, 404));
+};

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz - Learning Module System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="topbar"></header>
+  <main class="container">
+    <div id="msg" class="msg" role="alert"></div>
+
+    <section class="card">
+      <div class="row between"><h1 id="title" style="margin:0">Quiz</h1><a id="back" class="btn small secondary" href="courses.html">Back to course</a></div>
+      <p class="muted" id="desc"></p>
+      <div id="meta" class="row"></div>
+    </section>
+
+    <section class="card" id="take-card" hidden>
+      <div class="row between"><h2 style="margin:0">Take the quiz</h2><button id="start-btn">Start attempt</button></div>
+      <form id="quiz-form" class="stack" hidden></form>
+      <div id="result" style="margin-top:12px"></div>
+    </section>
+
+    <section class="card" id="attempts-card">
+      <h2>Attempts</h2>
+      <div id="attempts"><p class="empty">Loading...</p></div>
+    </section>
+
+    <section class="card" id="staff-card" hidden>
+      <h2>Questions</h2>
+      <div id="questions"></div>
+      <h3>Add question</h3>
+      <form id="question-form" class="stack">
+        <label for="q-text">Question</label><textarea id="q-text" required></textarea>
+        <div class="row">
+          <div style="flex:1"><label for="q-type">Type</label>
+            <select id="q-type"><option value="multiple_choice">multiple choice</option><option value="true_false">true / false</option><option value="short_answer">short answer</option></select></div>
+          <div style="flex:1"><label for="q-points">Points</label><input id="q-points" type="number" min="0.01" step="0.01" value="1"></div>
+        </div>
+        <div id="options-wrap"><label for="q-options">Options (one per line)</label><textarea id="q-options" placeholder="Option A&#10;Option B&#10;Option C"></textarea></div>
+        <label for="q-answer">Correct answer <span class="muted" id="q-answer-hint">(must match one option)</span></label>
+        <input id="q-answer" required>
+        <button type="submit">Add question</button>
+      </form>
+    </section>
+  </main>
+  <script src="js/app.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>

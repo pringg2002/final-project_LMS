@@ -1,15 +1,14 @@
-const jwt = require("jsonwebtoken");
-const config = require("./config");
+const jwt = require('jsonwebtoken');
+const config = require('./config');
 
-function generateToken(payload) {
-    return jwt.sign(payload, config.jwt.secret);
-}
+const signToken = (user) =>
+  jwt.sign({ user_id: user.user_id, role: user.role }, config.jwt.secret, {
+    expiresIn: config.jwt.expiresIn,
+  });
 
-function verifyToken(token) {
-    return jwt.verify(token, config.jwt.secret);
-}
+const verifyToken = (token) => jwt.verify(token, config.jwt.secret);
 
-module.exports = {
-    generateToken,
-    verifyToken
+module.exports = { 
+    signToken, 
+    verifyToken 
 };

@@ -1,21 +1,10 @@
-function role(...allowedRoles) {
-    return (req, res, next) => {
-        if (!req.user) {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication required"
-            });
-        }
+const AppError = require('../utils/AppError');
 
-        if (!allowedRoles.includes(req.user.role)) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied"
-            });
-        }
 
-        next();
-    };
-}
-
-module.exports = role;
+module.exports = (...allowedRoles) => (req, res, next) => {
+    if (!req.user) return next(new AppError('Authentication required', 401));
+    if (!allowedRoles.includes(req.user.role)) {
+        return next(new AppError('You do not have permission to perform this action', 403));
+    }
+    next();
+};

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Courses - Learning Module System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .hero #course-status .badge { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <header id="topbar"></header>
+
+  <main class="container">
+    <div id="msg" class="msg" role="alert"></div>
+
+    <div id="list-view">
+      <section class="card hero">
+        <h1>Courses</h1>
+        <p>Browse your courses and open one to see its modules.</p>
+      </section>
+
+      <section class="card" id="create-card" hidden>
+        <h2>New course</h2>
+        <form id="course-form" class="stack">
+          <div class="row">
+            <div style="flex:1"><label for="code">Course code</label><input id="code" required placeholder="DBMS101"></div>
+            <div style="flex:3"><label for="name">Course name</label><input id="name" required placeholder="Database Management Systems"></div>
+          </div>
+          <label for="desc">Description</label>
+          <textarea id="desc"></textarea>
+          <label for="status">Status</label>
+          <select id="status"><option value="draft">draft</option><option value="published">published</option></select>
+          <button type="submit">Create course</button>
+        </form>
+      </section>
+
+      <div id="courses" class="grid"></div>
+    </div>
+
+    <div id="detail-view" hidden>
+      <section class="card hero">
+        <div class="row between"><h1 id="course-title">Course</h1><span id="course-status"></span></div>
+        <p id="course-desc"></p>
+        <div id="course-actions" class="row"></div>
+      </section>
+
+      <section class="card" id="add-module-card" hidden>
+        <h2>Add module</h2>
+        <form id="module-form" class="stack">
+          <label for="m-title">Title</label><input id="m-title" required>
+          <label for="m-desc">Description</label><textarea id="m-desc"></textarea>
+          <div class="row">
+            <div style="flex:1"><label for="m-score">Passing score (%)</label><input id="m-score" type="number" min="0" max="100" value="75"></div>
+            <div style="flex:1"><label for="m-status">Status</label>
+              <select id="m-status"><option value="draft">draft</option><option value="published">published</option></select></div>
+          </div>
+          <button type="submit">Add module</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Announcements</h2>
+        <div id="announcements"><p class="empty">Loading...</p></div>
+        <form id="announcement-form" class="stack" hidden style="margin-top:12px">
+          <input name="title" placeholder="Announcement title" required>
+          <textarea name="content" placeholder="Write an announcement for enrolled students" required></textarea>
+          <button type="submit">Post announcement</button>
+        </form>
+      </section>
+
+      <h2>Modules</h2>
+      <div id="modules"></div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var isDetail = !!new URLSearchParams(window.location.search).get('id');
+      document.getElementById('list-view').hidden = isDetail;
+      document.getElementById('detail-view').hidden = !isDetail;
+      document.title = (isDetail ? 'Course' : 'Courses') + ' - Learning Module System';
+
+      var files = ['app.js'].concat(isDetail
+        ? ['modules.js', 'announcements.js', 'lesson.js', 'quiz.js', 'collaboration.js', 'adaptive.js']
+        : ['courses.js', 'enrollments.js']);
+      files.forEach(function (f) { document.write('<script src="js/' + f + '"><\/script>'); });
+    })();
+  </script>
+</body>
+</html>

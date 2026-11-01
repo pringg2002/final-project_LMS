@@ -8,6 +8,26 @@
     "mysql2": "^3.24.6",
     "sqlite3": "^6.0.1"
   },
+  "name": "lms-finals",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pringg2002/final-project_LMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/pringg2002/final-project_LMS/issues"
+  },
+  "homepage": "https://github.com/pringg2002/final-project_LMS#readme",
   "devDependencies": {
     "nodemon": "^3.1.14"
   }

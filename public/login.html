@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Learning Module System - Login</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="login-page">
+
+    <div class="login-container">
+
+        <div class="login-left">
+
+            <h1>Learning Module System</h1>
+
+            <p class="login-subtitle">
+                Sign in to continue learning
+            </p>
+
+            <form class="login-form"
+        id="loginForm" method="POST" action="/login">
+
+                <label for="email">Email</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+                <label for="password">Password</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+                <button type="submit" class="login-button">
+                    Log in
+                </button>
+                <p id="loginMessage"></p>
+
+            </form>
+
+            <p class="register-text">
+                No account?
+                <a href="register.html">
+                    Register as a student
+                </a>
+            </p>
+
+        </div>
+
+        <div class="login-right">
+
+            <div class="login-right-content">
+
+                <h2>Learn. Grow. Succeed.</h2>
+
+                <p>
+                    Access your courses, lessons, quizzes,
+                    assignments, and learning progress
+                    in one place.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<script>
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        loginMessage.textContent = 'Logging in...';
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                loginMessage.textContent =
+                    result.message || 'Login failed.';
+                return;
+            }
+
+            localStorage.setItem(
+                'token',
+                result.data.token
+            );
+
+            localStorage.setItem(
+                'user',
+                JSON.stringify(result.data.user)
+            );
+
+            loginMessage.textContent = 'Login successful!';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 500);
+
+        } catch (error) {
+            console.error('Login error:', error);
+
+            loginMessage.textContent =
+                'Unable to connect to the server.';
+        }
+    });
+</script>
+
+</body>
+</html>

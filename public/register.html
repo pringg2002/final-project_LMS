@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Learning Module System - Register</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="login-page">
+
+    <div class="login-container">
+
+        <div class="login-left register-left">
+
+            <h1>Learning Module System</h1>
+
+            <p class="login-subtitle">
+                Create your student account
+            </p>
+
+            <form id="registerForm" class="login-form">
+
+                <label for="firstName">First Name</label>
+
+                <input
+                    type="text"
+                    id="firstName"
+                    name="first_name"
+                    placeholder="Enter your first name"
+                    required
+                >
+                <label for="middleName">Middle Name</label>
+
+                <input
+                    type="text"
+                    id="middleName"
+                    name="middle_name"
+                    placeholder="Enter your middle name"
+                >
+                <div class="middle-name-option">
+
+                    <input
+                        type="checkbox"
+                        id="noMiddleName"
+                        name="no_middle_name"
+                    >
+
+                    <label for="noMiddleName">
+                        I don't have a middle name
+                    </label>
+
+                </div>
+                <label for="lastName">Last Name</label>
+
+                <input
+                    type="text"
+                    id="lastName"
+                    name="last_name"
+                    placeholder="Enter your last name"
+                    required
+                >
+                <label for="email">Email</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+                <label for="password">Password</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+                <small class="password-hint">
+                    Password must be at least 8 characters and contain
+                    a letter and a number.
+                </small>
+
+                <label for="confirmPassword">Confirm Password</label>
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirm_password"
+                    placeholder="Confirm your password"
+                    required
+                >
+
+                <div id="registerMessage" class="register-message"></div>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                    id="registerButton"
+                >
+                    Create Account
+                </button>
+
+            </form>
+
+            <p class="register-text">
+                Already have an account?
+                <a href="login.html">Log in</a>
+            </p>
+
+        </div>
+
+        <div class="login-right">
+
+            <div class="decorative-circle circle-one"></div>
+            <div class="decorative-circle circle-two"></div>
+            <div class="decorative-circle circle-three"></div>
+
+            <div class="login-right-content">
+
+                <h2>
+                    Start Your Learning Journey
+                </h2>
+
+                <p>
+                    Create your account and access your courses,
+                    lessons, quizzes, assignments, and learning
+                    progress in one place.
+                </p>
+
+                <div class="register-benefits">
+
+                    <div class="benefit">
+                        <span>✓</span>
+                        <p>Access your learning modules</p>
+                    </div>
+
+                    <div class="benefit">
+                        <span>✓</span>
+                        <p>Track your learning progress</p>
+                    </div>
+
+                    <div class="benefit">
+                        <span>✓</span>
+                        <p>Take quizzes and assignments</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const registerForm =
+            document.getElementById("registerForm");
+
+        const middleName =
+            document.getElementById("middleName");
+
+        const noMiddleName =
+            document.getElementById("noMiddleName");
+
+        const password =
+            document.getElementById("password");
+
+        const confirmPassword =
+            document.getElementById("confirmPassword");
+
+        const registerMessage =
+            document.getElementById("registerMessage");
+            
+        const registerButton =
+            document.getElementById("registerButton");
+
+        noMiddleName.addEventListener("change", function () {
+
+            if (this.checked) {
+                middleName.value = "";
+                middleName.disabled = true;
+                middleName.placeholder =
+                    "No middle name";
+
+            } else {
+                middleName.disabled = false;
+                middleName.placeholder =
+                    "Enter your middle name";
+            }
+
+        });
+
+        registerForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const firstName =
+                document.getElementById("firstName")
+                    .value
+                    .trim();
+
+            const middleNameValue =
+                middleName.value.trim();
+
+            const lastName =
+                document.getElementById("lastName")
+                    .value
+                    .trim();
+
+            const email =
+                document.getElementById("email")
+                    .value
+                    .trim();
+
+            const passwordValue =
+                password.value;
+            const confirmPasswordValue =
+                confirmPassword.value;
+
+            registerMessage.textContent = "";
+            registerMessage.className =
+                "register-message";
+
+            if (!firstName || !lastName || !email || !passwordValue) {
+                showMessage(
+                    "Please fill in all required fields.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (passwordValue.length < 8) {
+                showMessage(
+                    "Password must be at least 8 characters.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (!/[A-Za-z]/.test(passwordValue)) {
+                showMessage(
+                    "Password must contain at least one letter.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (!/\d/.test(passwordValue)) {
+                showMessage(
+                    "Password must contain at least one number.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (passwordValue !== confirmPasswordValue) {
+                showMessage(
+                    "Passwords do not match.",
+                    "error"
+                );
+
+                return;
+            }
+
+            registerButton.disabled = true;
+            registerButton.textContent =
+                "Creating Account...";
+            try {
+
+                const response = await fetch(
+                    "/api/auth/register",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            first_name: firstName,
+                            middle_name:
+                                noMiddleName.checked
+                                    ? null
+                                    : middleNameValue,
+                            last_name: lastName,
+                            email: email,
+                            password: passwordValue
+
+                        })
+                    }
+                );
+
+                const data =
+                    await response.json();
+                if (!response.ok || !data.success) {
+                    showMessage(
+                        data.message ||
+                        "Registration failed. Please try again.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                showMessage(
+                    "Account created successfully! Redirecting to login...",
+                    "success"
+                );
+
+                setTimeout(function () {
+                    window.location.href =
+                        "login.html";
+                }, 1500);
+
+
+            } catch (error) {
+
+                console.error(
+                    "Registration error:",
+                    error
+                );
+
+                showMessage(
+                    "Unable to connect to the server. Please make sure the backend is running.",
+                    "error"
+                );
+
+            } finally {
+
+                registerButton.disabled = false;
+                registerButton.textContent =
+                    "Create Account";
+
+            }
+
+        });
+
+
+        function showMessage(message, type) {
+            registerMessage.textContent = message;
+            registerMessage.className =
+                "register-message " + type;
+        }
+
+    </script>
+
+</body>
+</html>
