@@ -3,7 +3,7 @@ const { parseId } = require('../lib/validate');
 const { success, created } = require('../utils/response');
 const asyncHandler = require('../utils/asyncHandler');
 
-
+// ---- lessons ----
 exports.listByModule = asyncHandler(async (req, res) =>
   success(
     res,
@@ -59,7 +59,7 @@ exports.remove = asyncHandler(async (req, res) => {
   success(res, null, 'Lesson deleted successfully');
 });
 
-
+// ---- resources ----
 exports.listResources = asyncHandler(async (req, res) =>
   success(
     res,
