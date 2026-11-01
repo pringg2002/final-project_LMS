@@ -11,6 +11,7 @@ exports.mine = asyncHandler(async (req, res) =>
   )
 );
 
+
 exports.forLesson = asyncHandler(async (req, res) =>
   success(
     res,
@@ -22,6 +23,7 @@ exports.forLesson = asyncHandler(async (req, res) =>
   )
 );
 
+
 exports.record = asyncHandler(async (req, res) => {
   const { progress } = await progressService.record(
     req.body,
@@ -30,6 +32,7 @@ exports.record = asyncHandler(async (req, res) => {
 
   created(res, progress, 'Progress saved successfully');
 });
+
 
 exports.update = asyncHandler(async (req, res) => {
   const { progress } = await progressService.updateById(
