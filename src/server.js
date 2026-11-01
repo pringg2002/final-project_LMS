@@ -13,6 +13,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+app.get('/', (req, res) => {
+  res.send('Learning Module System Server is working!');
+});
+
 app.use('/api', routes);
 
 app.use('/api', notFound);
