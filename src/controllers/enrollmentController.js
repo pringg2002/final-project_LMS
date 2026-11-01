@@ -1,52 +1,22 @@
-const enrollmentModel = require('../models/enrollment.model');
+const enrollmentService = require('../services/enrollment.service');
+const { parseId } = require('../lib/validate');
+const { success, created } = require('../utils/response');
 
-const getEnrollmentsByUser = async (req, res) => {
-    try {
-        const { user_id } = req.params;
-        const [enrollments] = await req.db.query(
-            "SELECT * FROM enrollments WHERE user_id = ? ORDER BY enrollment_date DESC",
-            [user_id]
-        );
-        res.status(200).json({ success: true, data: enrollments });
-    } catch (error) {
-        console.error("Error fetching enrollments:", error);
-        res.status(500).json({ success: false, message: "Server error" });
-    }
+exports.list = async (req, res) => {
+  const courseId = req.query.course_id ? parseId(req.query.course_id, 'course_id') : undefined;
+  success(res, await enrollmentService.list(req.user, { courseId }), 'Enrollments retrieved successfully');
 };
 
-const createEnrollment = async (req, res) => {
-    try {
-        const { user_id, course_id } = req.body;
-        
-        const [result] = await req.db.query(
-            "INSERT INTO enrollments (user_id, course_id) VALUES (?, ?)",
-            [user_id, course_id]
-        );
+exports.get = async (req, res) =>
+  success(res, await enrollmentService.getById(parseId(req.params.id), req.user), 'Enrollment retrieved successfully');
 
-        res.status(201).json({ 
-            success: true, 
-            message: "Enrolled successfully", 
-            enrollment_id: result.insertId 
-        });
-    } catch (error) {
-        console.error("Error creating enrollment:", error);
-        res.status(500).json({ success: false, message: "Server error" });
-    }
+exports.create = async (req, res) =>
+  created(res, await enrollmentService.create(req.body, req.user), 'Enrolled successfully');
+
+exports.update = async (req, res) =>
+  success(res, await enrollmentService.update(parseId(req.params.id), req.body, req.user), 'Enrollment updated successfully');
+
+exports.remove = async (req, res) => {
+  await enrollmentService.remove(parseId(req.params.id), req.user);
+  success(res, null, 'Enrollment deleted successfully');
 };
-
-const getEnrollmentActivity = async (req, res) => {
-    try {
-        const data = await enrollmentModel.getEnrollmentActivityReport();
-        return res.status(200).json({ success: true, data });
-    } catch (error) {
-        console.error("Error fetching enrollment activity report:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
-    }
-};
-
-module.exports = {
-    getEnrollmentsByUser,
-    createEnrollment,
-    getEnrollmentActivity
-};
-

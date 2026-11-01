@@ -1,38 +1,12 @@
-const getAttemptAnswers = async (req, res) => {
-    try {
-        const { attempt_id } = req.params;
-        const [answers] = await req.db.query(
-            "SELECT * FROM attempt_answers WHERE attempt_id = ?", 
-            [attempt_id]
-        );
-        res.status(200).json({ success: true, data: answers });
-    } catch (error) {
-        console.error("Error fetching attempt answers:", error);
-        res.status(500).json({ success: false, message: "Server error" });
-    }
-};
+const answerService = require('../services/answer.service');
+const { parseId } = require('../lib/validate');
+const { success, created } = require('../utils/response');
 
-const createAttemptAnswer = async (req, res) => {
-    try {
-        const { attempt_id, question_id, answer_text, is_correct } = req.body;
-        
-        const [result] = await req.db.query(
-            "INSERT INTO attempt_answers (attempt_id, question_id, answer_text, is_correct) VALUES (?, ?, ?, ?)",
-            [attempt_id, question_id, answer_text, is_correct]
-        );
+exports.listByAttempt = async (req, res) =>
+  success(res, await answerService.listByAttempt(parseId(req.params.attemptId, 'attemptId'), req.user), 'Answers retrieved successfully');
 
-        res.status(201).json({ 
-            success: true, 
-            message: "Answer recorded successfully", 
-            answer_id: result.insertId 
-        });
-    } catch (error) {
-        console.error("Error saving attempt answer:", error);
-        res.status(500).json({ success: false, message: "Server error" });
-    }
-};
+exports.save = async (req, res) =>
+  created(res, await answerService.save(parseId(req.params.attemptId, 'attemptId'), req.body, req.user), 'Answers saved successfully');
 
-module.exports = {
-    getAttemptAnswers,
-    createAttemptAnswer
-};
+exports.update = async (req, res) =>
+  success(res, await answerService.update(parseId(req.params.id), req.body, req.user), 'Answer updated successfully');

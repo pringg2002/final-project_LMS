@@ -1,18 +1,16 @@
-<<<<<<< HEAD
 const express = require('express');
 const router = express.Router();
 const enrollmentRoutes = require('./enrollments');
-
-router.use('/enrollments', enrollmentRoutes);
-=======
-const router = require('express').Router();
+const assignmentRoutes = require('./assignments');         
+const attemptAnswersRoutes = require('./attemptAnswers');  
 const { success } = require('../utils/response');
 
-router.get('/health', (req, res) => success(res, null, 'Learning Module API is running'));
+router.get('/health', (req, res) => success(res, null, 'Learning Module System API is running'));
 
+router.use('/enrollments', enrollmentRoutes);
+router.use('/assignments', assignmentRoutes);
+router.use('/attempt-answers', attemptAnswersRoutes);
 router.use('/auth', require('./auth'));
 router.use('/users', require('./user'));
-
->>>>>>> origin/main
 
 module.exports = router;
