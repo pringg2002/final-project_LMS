@@ -1,6 +1,14 @@
 require('dotenv').config();
 
 const config = {
+<<<<<<< HEAD
+    port: process.env.PORT || 3000,
+
+    db: {
+        dialect: "sqlite",
+        storage: "./lms_final_database.sqlite"
+    },
+=======
   port: Number(process.env.PORT) || 3000,
   db: {
     host: process.env.DB_HOST || 'localhost',
@@ -12,6 +20,7 @@ const config = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   },
+>>>>>>> origin/main
 };
 
 if (!config.jwt.secret || config.jwt.secret === 'your_secret_here') {
