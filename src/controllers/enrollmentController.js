@@ -1,3 +1,5 @@
+const enrollmentModel = require('../models/enrollment.model');
+
 const getEnrollmentsByUser = async (req, res) => {
     try {
         const { user_id } = req.params;
@@ -32,8 +34,19 @@ const createEnrollment = async (req, res) => {
     }
 };
 
+const getEnrollmentActivity = async (req, res) => {
+    try {
+        const data = await enrollmentModel.getEnrollmentActivityReport();
+        return res.status(200).json({ success: true, data });
+    } catch (error) {
+        console.error("Error fetching enrollment activity report:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
 module.exports = {
     getEnrollmentsByUser,
-    createEnrollment
+    createEnrollment,
+    getEnrollmentActivity
 };
 

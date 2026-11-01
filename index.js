@@ -1,11 +1,15 @@
-const express = require('express');
-const app = express();
-const PORT = 3000;
+const express = require("express");
+const router = express.Router();
 
-app.get('/', (req, res) => {
-  res.send('Server is running!');
+const enrollmentRoutes = require("./enrollments");
+
+router.get("/status", (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "Learning Module API is running"
+    });
 });
 
-app.listen(PORT, () => {
-  console.log('Server listening on port 3000');
-  });
+router.use("/enrollments", enrollmentRoutes);
+
+module.exports = router;
