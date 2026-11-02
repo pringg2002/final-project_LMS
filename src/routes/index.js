@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const enrollmentRoutes = require('./enrollments');
-const assignmentRoutes = require('./assignments');         
-const attemptAnswersRoutes = require('./attemptAnswers');  
+const assignmentRoutes = require('./assignment');         
+const attemptAnswersRoutes = require('./attemptAnswer');  
 const { success } = require('../utils/response');
 
 router.get('/health', (req, res) => success(res, null, 'Learning Module System API is running'));

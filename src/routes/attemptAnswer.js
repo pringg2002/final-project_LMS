@@ -1,6 +1,6 @@
 // Member 6 - attempt answers. Mounted at "/" (full /api/... paths, auth per route).
 const router = require('express').Router();
-const controller = require('../controllers/answer.controller');
+const controller = require('../controllers/attemptAnswersController');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 const asyncHandler = require('../utils/asyncHandler');

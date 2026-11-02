@@ -1,4 +1,4 @@
-const answerService = require('../services/answer.service');
+const answerService = require('../services/attemptAnswers.service');
 const { parseId } = require('../lib/validate');
 const { success, created } = require('../utils/response');
 
