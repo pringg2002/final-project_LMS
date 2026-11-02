@@ -7,9 +7,9 @@ const { success } = require('../utils/response');
 
 router.get('/health', (req, res) => success(res, null, 'Learning Module System API is running'));
 
-router.use('/enrollments', enrollmentRoutes);
-router.use('/assignments', assignmentRoutes);
-router.use('/attempt-answers', attemptAnswersRoutes);
+router.use('/enrollments', require ('./enrollments'));
+router.use('/assignments', require('./assignments'));
+router.use('/attempt-answers', require('./attemptAnswers'));
 router.use('/auth', require('./auth'));
 router.use('/users', require('./user'));
 
