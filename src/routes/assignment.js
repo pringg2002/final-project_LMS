@@ -1,4 +1,26 @@
-<<<<<<< HEAD
+const router = require('express').Router();
+const controller = require('../controllers/assignment.controller');
+const auth = require('../middleware/auth');
+const role = require('../middleware/role');
+const asyncHandler = require('../utils/asyncHandler');
+const { ROLES } = require('../lib/roles');
+
+const staff = role(ROLES.ADMIN, ROLES.INSTRUCTOR);
+const student = role(ROLES.STUDENT);
+
+router.get('/modules/:moduleId/assignments', auth, asyncHandler(controller.listByModule));
+router.post('/modules/:moduleId/assignments', auth, staff, asyncHandler(controller.createInModule));
+router.get('/assignments/:id', auth, asyncHandler(controller.get));
+router.put('/assignments/:id', auth, staff, asyncHandler(controller.update));
+router.delete('/assignments/:id', auth, staff, asyncHandler(controller.remove));
+
+router.get('/assignments/:assignmentId/submissions', auth, asyncHandler(controller.listSubmissions));
+router.post('/assignments/:assignmentId/submissions', auth, student, asyncHandler(controller.createSubmission));
+router.get('/submissions/:id', auth, asyncHandler(controller.getSubmission));
+router.put('/submissions/:id', auth, asyncHandler(controller.updateSubmission));
+router.delete('/submissions/:id', auth, asyncHandler(controller.removeSubmission));
+
+module.exports = router;
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/asyncHandler');
@@ -10,32 +32,3 @@ router.get('/', auth, asyncHandler(async (req, res) => {
 }));
 
 module.exports = router;
-=======
-const Assignment = require('../models/assignment.model');
-
-// Get all assignments
-exports.getAllAssignments = (req, res) => {
-    Assignment.getAll((err, results) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json({ success: true, data: results });
-    });
-};
-
-// Create a new assignment
-exports.createAssignment = (req, res) => {
-    const assignmentData = req.body;
-    
-    Assignment.create(assignmentData, (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ 
-            success: true, 
-            message: "Assignment created successfully",
-            assignmentId: results.insertId 
-        });
-    });
-};
->>>>>>> origin/main
