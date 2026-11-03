@@ -1,7 +1,7 @@
 // Member 6 - saving and auto-grading quiz answers.
 const answerModel = require('../models/attemptAnswer.models');
 const questionModel = require('../models/question.models');
-const attemptService = require('./attempt.service');
+const attempstService = require('./attempt.service');
 const { gradeAnswer } = require('../lib/grading');
 const AppError = require('../utils/AppError');
 

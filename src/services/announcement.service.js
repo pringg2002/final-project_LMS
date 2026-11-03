@@ -1,5 +1,5 @@
 // Member 6 - announcement business rules.
-const announcementModel = require('../models/announcement.models');
+const announcementModel = require('../models/announcement.model');
 const enrollmentModel = require('../models/enrollment.models');
 const enrollmentService = require('./enrollment.service');
 const notificationService = require('./notification.service');

@@ -1,12 +1,12 @@
 // Member 6 - enrollments + announcements. Mounted at "/" (full /api/... paths, auth per route).
-const router = require('express').Router();
-const enrollmentController = require('../controllers/enrollment.controller');
-const announcementController = require('../controllers/announcement.controller');
+const express = require('express');
+const router = express.Router();
+const enrollmentController = require('../controllers/enrollmentController');
+const announcementController = require('../controllers/announcementController');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 const asyncHandler = require('../utils/asyncHandler');
 const { ROLES } = require('../lib/roles');
-
 const staff = role(ROLES.ADMIN, ROLES.INSTRUCTOR);
 
 // Enrollments (students manage their own; staff manage their courses' enrollments)
