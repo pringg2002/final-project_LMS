@@ -1,23 +1,17 @@
 require('dotenv').config();
 
 const config = {
-<<<<<<< HEAD
-  port: process.env.PORT || 3000,
-=======
   port: Number(process.env.PORT) || 3000,
->>>>>>> origin/main
   db: {
-    dialect: "sqlite",
-    storage: "./lms_final_database.sqlite"
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'lms_final_database',
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'fallback_secret_key',
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
-<<<<<<< HEAD
-  }
-=======
   },
->>>>>>> origin/main
 };
 
 module.exports = config;
