@@ -5,22 +5,26 @@ const { ROLES } = require('../lib/roles');
 const { requireFields, assertEnum, parseId } = require('../lib/validate');
 const { pick } = require('../utils/sql');
 const AppError = require('../utils/AppError');
+
 const STATUSES = ['draft', 'published', 'archived'];
+
 async function list(user) {
   if (user.role === ROLES.ADMIN) return courseModel.findAll({ all: true });
   if (user.role === ROLES.INSTRUCTOR) return courseModel.findAll({ publishedOrOwnedBy: user.user_id });
   return courseModel.findAll({ publishedOnly: true });
 }
+
 async function getById(courseId, user) {
   const course = await access.getCourseOrFail(courseId);
   const canSeeDraft = access.isAdmin(user) || course.instructor_id === user.user_id;
   if (course.status !== 'published' && !canSeeDraft) throw new AppError('Course not found', 404);
   return course;
 }
+
 async function create(body, user) {
   requireFields(body, ['course_code', 'course_name']);
   assertEnum(body.status, STATUSES, 'status');
- 
+
   let instructor_id = user.user_id;
   if (access.isAdmin(user) && body.instructor_id !== undefined) {
     const owner = await userModel.findById(parseId(body.instructor_id, 'instructor_id'));
@@ -29,6 +33,7 @@ async function create(body, user) {
     }
     instructor_id = owner.user_id;
   }
+
   const id = await courseModel.create({
     course_code: String(body.course_code).trim().toUpperCase(),
     course_name: String(body.course_name).trim(),
@@ -38,9 +43,11 @@ async function create(body, user) {
   });
   return courseModel.findById(id);
 }
+
 async function update(courseId, body, user) {
   await access.assertCourseManager(user, courseId);
   assertEnum(body.status, STATUSES, 'status');
+
   const fields = pick(body, ['course_code', 'course_name', 'description', 'status']);
   if (fields.course_code) fields.course_code = String(fields.course_code).trim().toUpperCase();
   if (body.instructor_id !== undefined) {
@@ -48,12 +55,16 @@ async function update(courseId, body, user) {
     fields.instructor_id = parseId(body.instructor_id, 'instructor_id');
   }
   if (!Object.keys(fields).length) throw new AppError('No valid fields to update', 400);
+
   await courseModel.update(courseId, fields);
   return courseModel.findById(courseId);
 }
+
 async function remove(courseId, user) {
   await access.assertCourseManager(user, courseId);
   await courseModel.remove(courseId);
 }
+
 const modulesReport = () => courseModel.getCourseModulesReport();
+
 module.exports = { list, getById, create, update, remove, modulesReport };
