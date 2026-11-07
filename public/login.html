@@ -1,185 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
 
-    <title>Learning Module System - Login</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/password-toggle.js" defer></script>
+  <title>
+    Learning Module System - Login
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
+
+  <script
+    src="js/password-toggle.js"
+    defer
+  ></script>
 </head>
 
 <body class="login-page">
 
-    <div class="login-container">
+  <div class="login-container">
 
-        <div class="login-left">
+    <div class="login-left">
 
-            <h1>Learning Module System</h1>
+      <h1>Learning Module System</h1>
 
-            <p class="login-subtitle">
-                Sign in to continue learning
-            </p>
+      <p class="login-subtitle">
+        Sign in to continue learning
+      </p>
 
-            <form
-                class="login-form"
-                id="loginForm"
-                method="POST"
-                action="/login"
+      <form
+        class="login-form"
+        id="loginForm"
+        method="POST"
+        action="/login"
+      >
+        <label for="email">
+          Email
+        </label>
+
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Enter your email"
+          autocomplete="email"
+          required
+        >
+
+        <label for="password">
+          Password
+        </label>
+
+        <div class="password-wrapper">
+
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
+
+          <button
+            type="button"
+            class="toggle-password"
+            aria-label="Show password"
+            aria-pressed="false"
+            aria-controls="password"
+          >
+            <svg
+              class="eye-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
             >
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+              <circle cx="12" cy="12" r="3"/>
 
-                <label for="email">Email</label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    autocomplete="email"
-                    required
-                >
-
-                <label for="password">Password</label>
-
-                <div class="password-wrapper">
-
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        autocomplete="current-password"
-                        required
-                    >
-
-                    <button
-                        type="button"
-                        class="toggle-password"
-                        aria-label="Show password"
-                        aria-pressed="false"
-                        aria-controls="password"
-                    >
-                        <svg
-                            class="eye-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true"
-                        >
-                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                            <path
-                                class="eye-slash"
-                                d="M3 3l18 18"
-                                style="display:none"
-                            />
-                        </svg>
-                    </button>
-
-                </div>
-
-                <button type="submit" class="login-button">
-                    Log in
-                </button>
-
-                <p id="loginMessage" role="status"></p>
-
-            </form>
-
-            <p class="register-text">
-                No account?
-                <a href="register.html">
-                    Register as a student
-                </a>
-            </p>
+              <path
+                class="eye-slash"
+                d="M3 3l18 18"
+                style="display:none"
+              />
+            </svg>
+          </button>
 
         </div>
 
-        <div class="login-right">
+        <button
+          type="submit"
+          class="login-button"
+        >
+          Log in
+        </button>
 
-            <div class="login-right-content">
+        <p
+          id="loginMessage"
+          role="status"
+        ></p>
+      </form>
 
-                <h2>Learn. Grow. Succeed.</h2>
+      <p class="register-text">
+        No account?
 
-                <p>
-                    Access your courses, lessons, quizzes,
-                    assignments, and learning progress
-                    in one place.
-                </p>
-
-            </div>
-
-        </div>
+        <a href="register.html">
+          Register as a student
+        </a>
+      </p>
 
     </div>
 
-    <script>
-        const loginForm =
-            document.getElementById('loginForm');
+    <div class="login-right">
+      <div class="login-right-content">
+        <h2>Learn. Grow. Succeed.</h2>
 
-        const loginMessage =
-            document.getElementById('loginMessage');
+        <p>
+          Access your courses, lessons, quizzes,
+          assignments, and learning progress
+          in one place.
+        </p>
+      </div>
+    </div>
 
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+  </div>
 
-            const email =
-                document.getElementById('email').value.trim();
+  <script>
+    const loginForm =
+      document.getElementById('loginForm');
 
-            const password =
-                document.getElementById('password').value;
+    const loginMessage =
+      document.getElementById('loginMessage');
 
-            loginMessage.textContent = 'Logging in...';
+    loginForm.addEventListener(
+      'submit',
+      async event => {
+        event.preventDefault();
 
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
-                });
+        const email =
+          document.getElementById('email')
+            .value.trim();
 
-                const result = await response.json();
+        const password =
+          document.getElementById('password')
+            .value;
 
-                if (!response.ok) {
-                    loginMessage.textContent =
-                        result.message || 'Login failed.';
-                    return;
-                }
+        loginMessage.textContent =
+          'Logging in...';
 
-                localStorage.setItem(
-                    'lms_token',
-                    result.data.token
-                );
-
-                localStorage.setItem(
-                    'lms_user',
-                    JSON.stringify(result.data.user)
-                );
-
-                loginMessage.textContent =
-                    'Login successful!';
-
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 500);
-
-            } catch (error) {
-                console.error('Login error:', error);
-
-                loginMessage.textContent =
-                    'Unable to connect to the server.';
+        try {
+          const response = await fetch(
+            '/api/auth/login',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                email: email,
+                password: password
+              })
             }
-        });
-    </script>
+          );
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            loginMessage.textContent =
+              result.message || 'Login failed.';
+            return;
+          }
+
+          localStorage.setItem(
+            'lms_token',
+            result.data.token
+          );
+
+          localStorage.setItem(
+            'lms_user',
+            JSON.stringify(result.data.user)
+          );
+
+          loginMessage.textContent =
+            'Login successful!';
+
+          setTimeout(() => {
+            window.location.href =
+              result.data.user.must_change_password
+                ? 'change-password.html'
+                : 'dashboard.html';
+          }, 500);
+
+        } catch (error) {
+          console.error('Login error:', error);
+
+          loginMessage.textContent =
+            'Unable to connect to the server.';
+        }
+      }
+    );
+  </script>
 
 </body>
 </html>
