@@ -6,6 +6,7 @@
 
     <title>Learning Module System - Register</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/password-toggle.js" defer></script>
 </head>
 
 <body class="login-page">
@@ -23,7 +24,6 @@
             <form id="registerForm" class="login-form">
 
                 <label for="firstName">First Name</label>
-
                 <input
                     type="text"
                     id="firstName"
@@ -31,29 +31,27 @@
                     placeholder="Enter your first name"
                     required
                 >
-                <label for="middleName">Middle Name</label>
 
+                <label for="middleName">Middle Name</label>
                 <input
                     type="text"
                     id="middleName"
                     name="middle_name"
                     placeholder="Enter your middle name"
                 >
-                <div class="middle-name-option">
 
+                <div class="middle-name-option">
                     <input
                         type="checkbox"
                         id="noMiddleName"
                         name="no_middle_name"
                     >
-
                     <label for="noMiddleName">
                         I don't have a middle name
                     </label>
-
                 </div>
-                <label for="lastName">Last Name</label>
 
+                <label for="lastName">Last Name</label>
                 <input
                     type="text"
                     id="lastName"
@@ -61,42 +59,93 @@
                     placeholder="Enter your last name"
                     required
                 >
-                <label for="email">Email</label>
 
+                <label for="email">Email</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     placeholder="Enter your email"
+                    autocomplete="email"
                     required
                 >
+
                 <label for="password">Password</label>
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    required
-                >
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                        aria-controls="password"
+                    >
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <small class="password-hint">
-                    Password must be at least 8 characters and contain
-                    a letter and a number.
+                    Password must be at least 8 characters
+                    and contain a letter and a number.
                 </small>
 
-                <label for="confirmPassword">Confirm Password</label>
+                <label for="confirmPassword">
+                    Confirm Password
+                </label>
 
-                <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirm_password"
-                    placeholder="Confirm your password"
-                    required
-                >
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirm_password"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                        required
+                    >
 
-                <div id="registerMessage" class="register-message"></div>
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                        aria-controls="confirmPassword"
+                    >
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
 
+                <div
+                    id="registerMessage"
+                    class="register-message"
+                    role="status"
+                ></div>
 
                 <button
                     type="submit"
@@ -123,9 +172,7 @@
 
             <div class="login-right-content">
 
-                <h2>
-                    Start Your Learning Journey
-                </h2>
+                <h2>Start Your Learning Journey</h2>
 
                 <p>
                     Create your account and access your courses,
@@ -159,7 +206,6 @@
     </div>
 
     <script>
-
         const registerForm =
             document.getElementById("registerForm");
 
@@ -177,7 +223,7 @@
 
         const registerMessage =
             document.getElementById("registerMessage");
-            
+
         const registerButton =
             document.getElementById("registerButton");
 
@@ -186,171 +232,160 @@
             if (this.checked) {
                 middleName.value = "";
                 middleName.disabled = true;
-                middleName.placeholder =
-                    "No middle name";
-
+                middleName.placeholder = "No middle name";
             } else {
                 middleName.disabled = false;
-                middleName.placeholder =
-                    "Enter your middle name";
+                middleName.placeholder = "Enter your middle name";
             }
 
         });
 
-        registerForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
-            const firstName =
-                document.getElementById("firstName")
-                    .value
-                    .trim();
+        registerForm.addEventListener(
+            "submit",
+            async function (event) {
 
-            const middleNameValue =
-                middleName.value.trim();
+                event.preventDefault();
 
-            const lastName =
-                document.getElementById("lastName")
-                    .value
-                    .trim();
+                const firstName =
+                    document.getElementById("firstName")
+                        .value.trim();
 
-            const email =
-                document.getElementById("email")
-                    .value
-                    .trim();
+                const middleNameValue =
+                    middleName.value.trim();
 
-            const passwordValue =
-                password.value;
-            const confirmPasswordValue =
-                confirmPassword.value;
+                const lastName =
+                    document.getElementById("lastName")
+                        .value.trim();
 
-            registerMessage.textContent = "";
-            registerMessage.className =
-                "register-message";
+                const email =
+                    document.getElementById("email")
+                        .value.trim();
 
-            if (!firstName || !lastName || !email || !passwordValue) {
-                showMessage(
-                    "Please fill in all required fields.",
-                    "error"
-                );
+                const passwordValue =
+                    password.value;
 
-                return;
-            }
+                const confirmPasswordValue =
+                    confirmPassword.value;
 
-            if (passwordValue.length < 8) {
-                showMessage(
-                    "Password must be at least 8 characters.",
-                    "error"
-                );
+                registerMessage.textContent = "";
+                registerMessage.className =
+                    "register-message";
 
-                return;
-            }
+                if (!firstName || !lastName ||
+                    !email || !passwordValue) {
 
-            if (!/[A-Za-z]/.test(passwordValue)) {
-                showMessage(
-                    "Password must contain at least one letter.",
-                    "error"
-                );
-
-                return;
-            }
-
-            if (!/\d/.test(passwordValue)) {
-                showMessage(
-                    "Password must contain at least one number.",
-                    "error"
-                );
-
-                return;
-            }
-
-            if (passwordValue !== confirmPasswordValue) {
-                showMessage(
-                    "Passwords do not match.",
-                    "error"
-                );
-
-                return;
-            }
-
-            registerButton.disabled = true;
-            registerButton.textContent =
-                "Creating Account...";
-            try {
-
-                const response = await fetch(
-                    "/api/auth/register",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            first_name: firstName,
-                            middle_name:
-                                noMiddleName.checked
-                                    ? null
-                                    : middleNameValue,
-                            last_name: lastName,
-                            email: email,
-                            password: passwordValue
-
-                        })
-                    }
-                );
-
-                const data =
-                    await response.json();
-                if (!response.ok || !data.success) {
                     showMessage(
-                        data.message ||
-                        "Registration failed. Please try again.",
+                        "Please fill in all required fields.",
                         "error"
                     );
-
                     return;
                 }
 
-                showMessage(
-                    "Account created successfully! Redirecting to login...",
-                    "success"
-                );
+                if (passwordValue.length < 8) {
+                    showMessage(
+                        "Password must be at least 8 characters.",
+                        "error"
+                    );
+                    return;
+                }
 
-                setTimeout(function () {
-                    window.location.href =
-                        "login.html";
-                }, 1500);
+                if (!/[A-Za-z]/.test(passwordValue)) {
+                    showMessage(
+                        "Password must contain at least one letter.",
+                        "error"
+                    );
+                    return;
+                }
 
+                if (!/\d/.test(passwordValue)) {
+                    showMessage(
+                        "Password must contain at least one number.",
+                        "error"
+                    );
+                    return;
+                }
 
-            } catch (error) {
+                if (passwordValue !== confirmPasswordValue) {
+                    showMessage(
+                        "Passwords do not match.",
+                        "error"
+                    );
+                    return;
+                }
 
-                console.error(
-                    "Registration error:",
-                    error
-                );
-
-                showMessage(
-                    "Unable to connect to the server. Please make sure the backend is running.",
-                    "error"
-                );
-
-            } finally {
-
-                registerButton.disabled = false;
+                registerButton.disabled = true;
                 registerButton.textContent =
-                    "Create Account";
+                    "Creating Account...";
 
+                try {
+
+                    const response = await fetch(
+                        "/api/auth/register",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                first_name: firstName,
+                                middle_name:
+                                    noMiddleName.checked
+                                        ? null
+                                        : middleNameValue,
+                                last_name: lastName,
+                                email: email,
+                                password: passwordValue
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        showMessage(
+                            data.message ||
+                            "Registration failed. Please try again.",
+                            "error"
+                        );
+                        return;
+                    }
+
+                    showMessage(
+                        "Account created successfully! Redirecting to login...",
+                        "success"
+                    );
+
+                    setTimeout(function () {
+                        window.location.href = "login.html";
+                    }, 1500);
+
+                } catch (error) {
+
+                    console.error(
+                        "Registration error:",
+                        error
+                    );
+
+                    showMessage(
+                        "Unable to connect to the server. Please make sure the backend is running.",
+                        "error"
+                    );
+
+                } finally {
+
+                    registerButton.disabled = false;
+                    registerButton.textContent =
+                        "Create Account";
+
+                }
             }
-
-        });
-
+        );
 
         function showMessage(message, type) {
             registerMessage.textContent = message;
             registerMessage.className =
                 "register-message " + type;
         }
-
     </script>
 
 </body>

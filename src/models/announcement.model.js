@@ -1,10 +1,9 @@
-// Member 6 - announcements table (SQLite compatible).
 const db = require('../db');
 const { updateById, deleteById } = require('../utils/sql');
 
 const BASE = `
   SELECT a.announcement_id, a.course_id, a.author_id, a.title, a.content, a.published_at, a.expires_at,
-         a.status, a.created_at, (u.first_name || ' ' || u.last_name) AS author_name
+         a.status, a.created_at, CONCAT(u.first_name, ' ', u.last_name) AS author_name
   FROM announcements a
   INNER JOIN users u ON u.user_id = a.author_id`;
 
@@ -12,7 +11,7 @@ const BASE = `
 async function findByCourse(courseId, { visibleOnly = false } = {}) {
   const [rows] = await db.query(
     `${BASE} WHERE a.course_id = ?
-     ${visibleOnly ? "AND a.status = 'published' AND (a.expires_at IS NULL OR a.expires_at > datetime('now'))" : ''}
+     ${visibleOnly ? "AND a.status = 'published' AND (a.expires_at IS NULL OR a.expires_at > CURRENT_TIMESTAMP)" : ''}
      ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.announcement_id DESC`,
     [courseId]
   );

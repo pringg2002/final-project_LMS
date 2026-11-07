@@ -1,16 +1,4 @@
 const db = require('../db');
-<<<<<<< HEAD
-
-// Question model stub for SQLite
-const Question = {
-  async findById(questionId) {
-    const [rows] = await db.query('SELECT * FROM questions WHERE question_id = ?', [questionId]);
-    return rows[0] || null;
-  }
-};
-
-module.exports = Question;
-=======
 const { updateById, deleteById } = require('../utils/sql');
 
 const COLS =
@@ -61,4 +49,3 @@ const update = (questionId, fields) => {
 const remove = (questionId) => deleteById('questions', 'question_id', questionId);
 
 module.exports = { findByQuiz, findById, nextOrder, sumPoints, create, update, remove };
->>>>>>> origin/main

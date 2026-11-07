@@ -7,6 +7,7 @@
     <title>Learning Module System - Login</title>
 
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/password-toggle.js" defer></script>
 </head>
 
 <body class="login-page">
@@ -21,8 +22,12 @@
                 Sign in to continue learning
             </p>
 
-            <form class="login-form"
-        id="loginForm" method="POST" action="/login">
+            <form
+                class="login-form"
+                id="loginForm"
+                method="POST"
+                action="/login"
+            >
 
                 <label for="email">Email</label>
 
@@ -31,23 +36,57 @@
                     id="email"
                     name="email"
                     placeholder="Enter your email"
+                    autocomplete="email"
                     required
                 >
 
                 <label for="password">Password</label>
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    required
-                >
+                <div class="password-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                        aria-controls="password"
+                    >
+                        <svg
+                            class="eye-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                            <path
+                                class="eye-slash"
+                                d="M3 3l18 18"
+                                style="display:none"
+                            />
+                        </svg>
+                    </button>
+
+                </div>
 
                 <button type="submit" class="login-button">
                     Log in
                 </button>
-                <p id="loginMessage"></p>
+
+                <p id="loginMessage" role="status"></p>
 
             </form>
 
@@ -78,62 +117,69 @@
 
     </div>
 
-<script>
-    const loginForm = document.getElementById('loginForm');
-    const loginMessage = document.getElementById('loginMessage');
+    <script>
+        const loginForm =
+            document.getElementById('loginForm');
 
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+        const loginMessage =
+            document.getElementById('loginMessage');
 
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-        loginMessage.textContent = 'Logging in...';
+            const email =
+                document.getElementById('email').value.trim();
 
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-            });
+            const password =
+                document.getElementById('password').value;
 
-            const result = await response.json();
+            loginMessage.textContent = 'Logging in...';
 
-            if (!response.ok) {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    loginMessage.textContent =
+                        result.message || 'Login failed.';
+                    return;
+                }
+
+                localStorage.setItem(
+                    'lms_token',
+                    result.data.token
+                );
+
+                localStorage.setItem(
+                    'lms_user',
+                    JSON.stringify(result.data.user)
+                );
+
                 loginMessage.textContent =
-                    result.message || 'Login failed.';
-                return;
+                    'Login successful!';
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 500);
+
+            } catch (error) {
+                console.error('Login error:', error);
+
+                loginMessage.textContent =
+                    'Unable to connect to the server.';
             }
-
-            localStorage.setItem(
-                'token',
-                result.data.token
-            );
-
-            localStorage.setItem(
-                'user',
-                JSON.stringify(result.data.user)
-            );
-
-            loginMessage.textContent = 'Login successful!';
-
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 500);
-
-        } catch (error) {
-            console.error('Login error:', error);
-
-            loginMessage.textContent =
-                'Unable to connect to the server.';
-        }
-    });
-</script>
+        });
+    </script>
 
 </body>
 </html>

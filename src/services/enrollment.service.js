@@ -1,4 +1,3 @@
-// Member 6 - enrollment business rules (SQLite compatible).
 const enrollmentModel = require('../models/enrollment.models');
 const userModel = require('../models/user.models');
 const access = require('./access.service');
