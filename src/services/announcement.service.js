@@ -1,5 +1,4 @@
-// Member 6 - announcement business rules.
-const announcementModel = require('../models/announcement.model');
+const announcementModel = require('../models/announcement.models');
 const enrollmentModel = require('../models/enrollment.models');
 const enrollmentService = require('./enrollment.service');
 const notificationService = require('./notification.service');
@@ -10,7 +9,6 @@ const AppError = require('../utils/AppError');
 
 const STATUSES = ['draft', 'published', 'archived'];
 
-// Course managers see everything; other staff and enrolled students see published, unexpired items.
 async function canManage(user, courseId) {
   try { await access.assertCourseManager(user, courseId); return true; } catch (e) { return false; }
 }
