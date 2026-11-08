@@ -11,7 +11,7 @@ const BASE = `
 async function findByCourse(courseId, { visibleOnly = false } = {}) {
   const [rows] = await db.query(
     `${BASE} WHERE a.course_id = ?
-     ${visibleOnly ? "AND a.status = 'published' AND (a.expires_at IS NULL OR a.expires_at > NOW())" : ''}
+     ${visibleOnly ? "AND a.status = 'published' AND (a.expires_at IS NULL OR a.expires_at > CURRENT_TIMESTAMP)" : ''}
      ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.announcement_id DESC`,
     [courseId]
   );

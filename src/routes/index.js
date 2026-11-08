@@ -1,16 +1,20 @@
-const express = require('express');
-const router = express.Router();
-const enrollmentRoutes = require('./enrollments');
-const assignmentRoutes = require('./assignment');         
-const attemptAnswersRoutes = require('./attemptAnswer');  
+const router = require('express').Router();
 const { success } = require('../utils/response');
 
-router.get('/health', (req, res) => success(res, null, 'Learning Module System API is running'));
+router.get('/health', (req, res) => success(res, null, 'Learning Module API is running'));
 
-router.use('/enrollments', require ('./enrollments'));
-router.use('/assignments', require('./assignments'));
-router.use('/attempt-answers', require('./attemptAnswers'));
 router.use('/auth', require('./auth'));
 router.use('/users', require('./user'));
+router.use('/notifications', require('./notification'));
+router.use('/reports', require('./report'));
+router.use(require('./course'));
+router.use(require('./module'));
+router.use(require('./lesson'));
+router.use(require('./quiz'));
+router.use(require('./assignment'));
+router.use(require('./discussion'));
+router.use(require('./adaptive'));
+router.use(require('./enrollment'));
+router.use(require('./answer'));
 
 module.exports = router;

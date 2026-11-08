@@ -24,4 +24,5 @@ router.get('/quizzes/:quizId/attempts', auth, asyncHandler(controller.listAttemp
 router.post('/quizzes/:quizId/attempts', auth, student, asyncHandler(controller.startAttempt));
 router.get('/attempts/:id', auth, asyncHandler(controller.getAttempt));
 router.post('/attempts/:id/submit', auth, student, asyncHandler(controller.submitAttempt));
+
 module.exports = router;

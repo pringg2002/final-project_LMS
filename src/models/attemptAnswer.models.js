@@ -21,8 +21,11 @@ async function upsert({ attempt_id, question_id, answer_text, is_correct, points
   await db.query(
     `INSERT INTO attempt_answers (attempt_id, question_id, answer_text, is_correct, points_earned)
      VALUES (?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE answer_text = VALUES(answer_text), is_correct = VALUES(is_correct),
-                             points_earned = VALUES(points_earned), answered_at = NOW()`,
+     ON DUPLICATE KEY UPDATE
+       answer_text = VALUES(answer_text),
+       is_correct = VALUES(is_correct),
+       points_earned = VALUES(points_earned),
+       answered_at = CURRENT_TIMESTAMP`,
     [attempt_id, question_id, answer_text, is_correct, points_earned]
   );
 }
