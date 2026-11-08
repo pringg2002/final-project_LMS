@@ -8,7 +8,7 @@ const AppError = require('../utils/AppError');
 const STATUSES = ['draft', 'published', 'archived'];
 
 async function listByCourse(courseId, user) {
-  const course = await access.getCourseOrFail(courseId);
+  const course = await require('./course.service').getById(courseId, user);
   if (access.isStaff(user)) return moduleModel.findByCourse(courseId);
   if (course.status !== 'published') throw new AppError('Course not found', 404);
   return moduleModel.findByCourse(courseId, { publishedOnly: true });
@@ -16,8 +16,8 @@ async function listByCourse(courseId, user) {
 
 async function getById(moduleId, user) {
   const module = await access.getModuleOrFail(moduleId);
+  const course = await require('./course.service').getById(module.course_id, user);
   if (!access.isStaff(user)) {
-    const course = await access.getCourseOrFail(module.course_id);
     if (module.status !== 'published' || course.status !== 'published') throw new AppError('Module not found', 404);
   }
   return module;
