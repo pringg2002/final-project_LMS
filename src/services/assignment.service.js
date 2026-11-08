@@ -29,6 +29,7 @@ async function getById(assignmentId, user) {
   await moduleService.getById(a.module_id, user);
   if (a.status === 'draft' && !access.isStaff(user)) throw new AppError('Assignment not found', 404);
   await adaptiveService.assertModuleAccess(user, a.module_id);
+  return a;
 }
 
 async function create(moduleId, body, user) {

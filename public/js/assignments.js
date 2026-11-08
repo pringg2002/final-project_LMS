@@ -1,17 +1,18 @@
 requireLogin();
+requireLearningRole();
 renderTopbar();
 
 const moduleId = qs('module');
 const $ = (id) => document.getElementById(id);
 const msgEl = $('msg');
-const staff = isStaffUser();
+const staff = isInstructorUser();
 let mod = null;
 
 async function load() {
   mod = await api(`/api/modules/${moduleId}`);
   $('title').textContent = `Assignments - ${mod.title}`;
-  $('back').href = `course.html?id=${mod.course_id}`;
-  if (staff) $('create-card').hidden = false;
+  $('back').href = `courses.html?id=${mod.course_id}`;
+  if (staff) { const course = await api(`/api/courses/${mod.course_id}`); if (Number(course.instructor_id) === Number((getUser()||{}).user_id)) $('create-card').hidden = false; }
   await render();
 }
 
@@ -127,5 +128,22 @@ $('assignment-form').addEventListener('submit', async (e) => {
   } catch (err) { showMessage(msgEl, err.message); }
 });
 
-if (!moduleId) window.location.href = 'courses.html';
+if (!moduleId) showModulePicker();
 else load().catch((err) => showMessage(msgEl, err.message));
+
+async function showModulePicker() {
+  const title=document.getElementById('title');
+  title.textContent='Choose a course module';
+  const form=document.getElementById('assignment-form')||document.getElementById('discussion-form');
+  if(form)form.closest('.card').hidden=true;
+  const slot=document.getElementById('assignments')||document.getElementById('discussions');
+  try {
+    const courses=await api('/api/courses');
+    const groups=await Promise.all(courses.map(async c=>{
+      try { const modules=await api(`/api/courses/${c.course_id}/modules`);
+        return `<section class="card"><h2>${esc(c.course_code)} — ${esc(c.course_name)}</h2>${modules.map(m=>`<p><a href="${location.pathname.split('/').pop()}?module=${m.module_id}">${esc(m.title)}</a></p>`).join('')||'<p class="muted">No modules yet.</p>'}</section>`;
+      }catch(e){return '';}
+    }));
+    slot.innerHTML=groups.join('')||'<p class="empty">No courses available.</p>';
+  } catch(e){slot.textContent=e.message;}
+}
