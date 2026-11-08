@@ -5,7 +5,7 @@ const role = require('../middleware/role');
 const asyncHandler = require('../utils/asyncHandler');
 const { ROLES } = require('../lib/roles');
 
-router.use(auth, role(ROLES.ADMIN, ROLES.INSTRUCTOR));
+router.use(auth, role(ROLES.ADMIN));
 
 router.get('/student-roles', asyncHandler(controller.studentRoles));
 router.get('/course-modules', asyncHandler(controller.courseModules));
