@@ -44,6 +44,7 @@ async function create({ quiz_id, student_id, attempt_number }) {
   ]);
   return result.insertId;
 }
+
 async function sumEarnedPoints(attemptId) {
   const [rows] = await db.query('SELECT COALESCE(SUM(points_earned), 0) AS total FROM attempt_answers WHERE attempt_id = ?', [attemptId]);
   return Number(rows[0].total);
