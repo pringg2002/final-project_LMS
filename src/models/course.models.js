@@ -11,7 +11,13 @@ async function findAll(scope = { publishedOnly: true }) {
   let where = '';
   const params = [];
   if (scope.publishedOnly) where = "WHERE c.status = 'published'";
-  else if (scope.publishedOrOwnedBy) {
+  else if (scope.instructorId) {
+    where = 'WHERE c.instructor_id = ?';
+    params.push(scope.instructorId);
+  } else if (scope.studentId) {
+    where = "WHERE c.status = 'published' AND EXISTS (SELECT 1 FROM enrollments e WHERE e.course_id = c.course_id AND e.student_id = ? AND e.status IN ('active', 'completed'))";
+    params.push(scope.studentId);
+  } else if (scope.publishedOrOwnedBy) {
     where = "WHERE c.status = 'published' OR c.instructor_id = ?";
     params.push(scope.publishedOrOwnedBy);
   }
