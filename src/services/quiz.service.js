@@ -2,13 +2,13 @@ const quizModel = require('../models/quiz.models');
 const questionModel = require('../models/question.models');
 const moduleService = require('./module.service');
 const access = require('./access.service');
+const adaptiveService = require('./adaptive.service');
 const { requireFields, assertEnum, assertNumber } = require('../lib/validate');
 const { pick } = require('../utils/sql');
 const AppError = require('../utils/AppError');
 
 const QUIZ_STATUSES = ['draft', 'published', 'archived'];
 const QUESTION_TYPES = ['multiple_choice', 'true_false', 'short_answer'];
-
 
 async function listByModule(moduleId, user) {
   await moduleService.getById(moduleId, user);
@@ -65,14 +65,15 @@ async function remove(quizId, user) {
   await quizModel.remove(quizId);
 }
 
-
 const withoutAnswer = ({ correct_answer, ...rest }) => rest;
+
 async function canSeeAnswers(user, quiz) {
   try { await access.assertModuleManager(user, quiz.module_id); return true; } catch (e) { return false; }
 }
 
 async function listQuestions(quizId, user) {
   const quiz = await getById(quizId, user);
+  await adaptiveService.assertModuleAccess(user, quiz.module_id);
   const questions = await questionModel.findByQuiz(quizId);
   return (await canSeeAnswers(user, quiz)) ? questions : questions.map(withoutAnswer);
 }
@@ -81,6 +82,7 @@ async function getQuestion(questionId, user) {
   const question = await questionModel.findById(questionId);
   if (!question) throw new AppError('Question not found', 404);
   const quiz = await getById(question.quiz_id, user);
+  await adaptiveService.assertModuleAccess(user, quiz.module_id);
   return (await canSeeAnswers(user, quiz)) ? question : withoutAnswer(question);
 }
 
