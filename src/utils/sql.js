@@ -22,11 +22,12 @@ async function deleteById(table, pk, id) {
   return result.affectedRows;
 }
 
+const pad = (n) => String(n).padStart(2, '0');
 function toMysqlDate(value) {
   if (value === undefined || value === null || value === '') return null;
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return undefined;
-  return d.toISOString().slice(0, 19).replace('T', ' ');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
 module.exports = { pick, updateById, deleteById, toMysqlDate };

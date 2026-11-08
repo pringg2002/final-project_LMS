@@ -13,7 +13,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "routes": "node src/utils/listRoutes.js",
+    "check:api": "node src/utils/checkApi.js",
+    "test": "node --test src/lib/logic.test.js"
   },
   "repository": {
     "type": "git",
