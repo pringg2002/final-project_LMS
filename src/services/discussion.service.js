@@ -8,6 +8,7 @@ const { pick } = require('../utils/sql');
 const AppError = require('../utils/AppError');
 
 async function assertCanParticipate(user, moduleId) {
+  if (user.role === 'admin') throw new AppError('Assignments and discussions are only for students and instructors', 403);
   const module = await moduleService.getById(moduleId, user);
   if (!access.isStaff(user) && !(await enrollmentService.isEnrolled(user.user_id, module.course_id))) {
     throw new AppError('Enroll in this course to join its discussions', 403);
