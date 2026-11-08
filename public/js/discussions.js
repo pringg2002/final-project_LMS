@@ -1,4 +1,5 @@
 requireLogin();
+requireLearningRole();
 renderTopbar();
 
 const moduleId = qs('module');
@@ -18,14 +19,14 @@ async function render() {
   const list = await api(`/api/modules/${moduleId}/discussions`);
   const html = [];
   for (const d of list) {
-    const canEdit = d.author_id === me.user_id || me.role === 'admin' || me.role === 'instructor';
+    const canEdit = d.author_id === me.user_id || me.role === 'instructor';
     let replies = '';
     if (open.has(d.discussion_id)) {
       const rs = await api(`/api/discussions/${d.discussion_id}/replies`);
       replies = `<div style="margin:10px 0 0 16px">${rs.map((r) => `
         <div class="notif"><div style="font-weight:400"><strong>${esc(r.author_name)}</strong>
           <small>${new Date(r.created_at).toLocaleString()}</small><div style="white-space:pre-wrap">${esc(r.content)}</div></div>
-          ${r.author_id === me.user_id || me.role === 'admin' || me.role === 'instructor'
+          ${r.author_id === me.user_id || me.role === 'instructor'
             ? `<button class="small secondary" data-del-reply="${r.reply_id}">Delete</button>` : ''}</div>`).join('') || '<p class="empty">No replies yet.</p>'}
         ${d.status === 'closed' ? '<p class="muted">This discussion is closed.</p>' : `
         <form class="row" data-reply="${d.discussion_id}"><input name="content" placeholder="Write a reply" required style="flex:1;min-width:200px"><button class="small" type="submit">Reply</button></form>`}</div>`;
@@ -75,5 +76,22 @@ $('discussion-form').addEventListener('submit', async (e) => {
   } catch (err) { showMessage(msgEl, err.message); }
 });
 
-if (!moduleId) window.location.href = 'courses.html';
+if (!moduleId) showModulePicker();
 else load().catch((err) => showMessage(msgEl, err.message));
+
+async function showModulePicker() {
+  const title=document.getElementById('title');
+  title.textContent='Choose a course module';
+  const form=document.getElementById('assignment-form')||document.getElementById('discussion-form');
+  if(form)form.closest('.card').hidden=true;
+  const slot=document.getElementById('assignments')||document.getElementById('discussions');
+  try {
+    const courses=await api('/api/courses');
+    const groups=await Promise.all(courses.map(async c=>{
+      try { const modules=await api(`/api/courses/${c.course_id}/modules`);
+        return `<section class="card"><h2>${esc(c.course_code)} — ${esc(c.course_name)}</h2>${modules.map(m=>`<p><a href="${location.pathname.split('/').pop()}?module=${m.module_id}">${esc(m.title)}</a></p>`).join('')||'<p class="muted">No modules yet.</p>'}</section>`;
+      }catch(e){return '';}
+    }));
+    slot.innerHTML=groups.join('')||'<p class="empty">No courses available.</p>';
+  } catch(e){slot.textContent=e.message;}
+}
