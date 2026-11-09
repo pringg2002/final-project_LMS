@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Manage - Learning Module System</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <header id="topbar"></header>
+
+  <main class="container">
+
+    <h1 class="page-title">Manage</h1>
+
+    <p class="page-subtitle">
+      Users, courses, instructors, and enrollments
+    </p>
+
+    <section class="card" id="admin-tools">
+
+      <h2>Administration</h2>
+
+      <p class="muted">
+        Create accounts, assign instructors,
+        and enroll students.
+      </p>
+
+      <div
+        id="admin-message"
+        class="msg"
+      ></div>
+
+      <div
+        id="generated-password-result"
+        class="card"
+        hidden
+        role="status"
+        aria-live="polite"
+      >
+        <strong>
+          New account temporary password
+        </strong>
+
+        <p
+          id="generated-password-text"
+          style="overflow-wrap: anywhere; font-family: monospace;"
+        ></p>
+
+        <p class="muted">
+          Copy and securely give this password
+          to the user. It will not be shown again.
+        </p>
+
+        <button
+          type="button"
+          class="secondary small"
+          id="copy-generated-password"
+        >
+          Copy password
+        </button>
+      </div>
+
+      <div class="admin-grid">
+
+        <form
+          id="create-user-form"
+          class="stack"
+        >
+          <h3>Add User</h3>
+
+          <label>
+            First name
+
+            <input
+              type="text"
+              name="first_name"
+              required
+            >
+          </label>
+
+          <label>
+            Last name
+
+            <input
+              type="text"
+              name="last_name"
+              required
+            >
+          </label>
+
+          <label>
+            Email
+
+            <input
+              type="email"
+              name="email"
+              required
+            >
+          </label>
+
+          <p class="muted">
+            A secure temporary password will be
+            generated automatically and shown once.
+          </p>
+
+          <label>
+            Role
+
+            <select name="role">
+              <option value="instructor">
+                Instructor
+              </option>
+
+              <option value="student">
+                Student
+              </option>
+            </select>
+          </label>
+
+          <button type="submit">
+            Add User
+          </button>
+        </form>
+
+        <form
+          id="reset-password-form"
+          class="stack"
+        >
+          <h3>Assign Temporary Password</h3>
+
+          <p class="muted">
+            Assign a temporary password.
+            The user must change it on next login.
+          </p>
+
+          <label>
+            User
+
+            <select
+              id="reset-user-select"
+              name="user_id"
+              required
+            ></select>
+          </label>
+
+          <label>
+            Temporary password
+
+            <input
+              type="password"
+              name="password"
+              autocomplete="new-password"
+              minlength="8"
+              required
+            >
+          </label>
+
+          <button type="submit">
+            Assign Temporary Password
+          </button>
+        </form>
+
+        <form
+          id="change-role-form"
+          class="stack"
+        >
+          <h3>Change User Role</h3>
+
+          <p class="muted">
+            Correct a user assigned the wrong role.
+            Existing teaching assignments or
+            enrollments may need review.
+          </p>
+
+          <label>
+            User
+
+            <select
+              id="change-role-user-select"
+              name="user_id"
+              required
+            ></select>
+          </label>
+
+          <label>
+            New role
+
+            <select
+              name="role"
+              required
+            >
+              <option value="student">
+                Student
+              </option>
+
+              <option value="instructor">
+                Instructor
+              </option>
+            </select>
+          </label>
+
+          <button type="submit">
+            Update Role
+          </button>
+        </form>
+
+        <form
+          id="create-course-form"
+          class="stack"
+        >
+          <h3>Create Course</h3>
+
+          <label>
+            Code
+
+            <input
+              type="text"
+              name="course_code"
+              required
+            >
+          </label>
+
+          <label>
+            Course name
+
+            <input
+              type="text"
+              name="course_name"
+              required
+            >
+          </label>
+
+          <label>
+            Instructor
+
+            <select
+              id="instructor-select"
+              name="instructor_id"
+              required
+            ></select>
+          </label>
+
+          <label>
+            Status
+
+            <select name="status">
+              <option value="published">
+                Published
+              </option>
+
+              <option value="draft">
+                Draft
+              </option>
+            </select>
+          </label>
+
+          <button type="submit">
+            Create Course
+          </button>
+        </form>
+
+        <form
+          id="enroll-student-form"
+          class="stack"
+        >
+          <h3>Enroll Student</h3>
+
+          <label>
+            Student
+
+            <select
+              id="student-select"
+              name="student_id"
+              required
+            ></select>
+          </label>
+
+          <label>
+            Course
+
+            <select
+              id="course-select"
+              name="course_id"
+              required
+            ></select>
+          </label>
+
+          <button type="submit">
+            Enroll Student
+          </button>
+        </form>
+
+      </div>
+
+      <h3>Course Instructor Assignments</h3>
+
+      <div id="admin-course-list"></div>
+
+      <h3>Current Enrollments</h3>
+
+      <div id="admin-enrollments"></div>
+
+    </section>
+
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/manage.js"></script>
+  <script src="js/password-toggle.js" defer></script>
+
+</body>
+</html>

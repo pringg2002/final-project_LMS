@@ -11,27 +11,27 @@ INSERT INTO roles (role_id, role_name, description) VALUES
 INSERT INTO users
 (user_id, role_id, first_name, last_name, email, password_hash, status)
 VALUES
-(1, 1, 'Ada', 'Admin', 'ada.admin@example.com',
+(1, 1, 'Ada', 'Admin', 'ada.admin@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(2, 2, 'Ian', 'Instructor', 'ian.instructor@example.com',
+(2, 2, 'Ian', 'Instructor', 'ian.instructor@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(3, 2, 'Sofia', 'Reyes', 'sofia.reyes@example.com',
+(3, 2, 'April Mae', 'Castillon', 'april.mae.castillon@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(4, 3, 'Stella', 'Student', 'stella.student@example.com',
+(4, 3, 'John Mar', 'Singuit', 'john.mar.singuit@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(5, 3, 'Mia', 'Santos', 'mia.santos@example.com',
+(5, 3, 'Louise', 'Tumale', 'louise.tumale@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(6, 3, 'Noah', 'Garcia', 'noah.garcia@example.com',
+(6, 3, 'Mark', 'Silverio', 'mark.silverio@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(7, 3, 'Liam', 'Cruz', 'liam.cruz@example.com',
+(7, 3, 'George Norman', 'Triplitt', 'george.norman.triplitt@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(8, 3, 'Ella', 'Ramos', 'ella.ramos@example.com',
+(8, 3, 'Zschem', 'Remoticado', 'zschem.remosticado@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(9, 3, 'Jack', 'Torres', 'jack.torres@example.com',
+(9, 3, 'Jack', 'Torres', 'jack.torres@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(10, 3, 'Zed', 'Villanueva', 'zed.villanueva@example.com',
+(10, 3, 'Zed', 'Villanueva', 'zed.villanueva@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active'),
-(11, 3, 'Ruth', 'Mendoza', 'ruth.mendoza@example.com',
+(11, 3, 'Ruth', 'Mendoza', 'ruth.mendoza@testlms.com',
  '$2a$10$yxazpyL1iZ7lpLr/c8w4l.Eyii7oI3pRwmyw1gS/euLF4CJEtz6RK', 'active');
 
 
