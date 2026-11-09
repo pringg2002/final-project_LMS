@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>My Profile - Learning Module System</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <header id="topbar"></header>
+
+  <main class="container">
+
+    <h1 class="page-title">My Profile</h1>
+
+    <p class="page-subtitle">
+      View your personal information and account details.
+    </p>
+
+    <section class="card profile-card">
+
+      <div class="profile-header">
+
+        <div class="profile-avatar">
+          <span id="profile-initials">U</span>
+        </div>
+
+        <div>
+          <h2 id="profile-fullname">Loading...</h2>
+          <p class="muted" id="profile-email"></p>
+          <span class="badge" id="profile-role"></span>
+        </div>
+
+      </div>
+
+      <h3>Personal Information</h3>
+
+      <div class="profile-grid">
+
+        <div class="profile-field">
+          <span>First Name</span>
+          <strong id="profile-firstname">—</strong>
+        </div>
+
+        <div class="profile-field">
+          <span>Last Name</span>
+          <strong id="profile-lastname">—</strong>
+        </div>
+
+        <div class="profile-field">
+          <span>Email Address</span>
+          <strong id="profile-email-detail">—</strong>
+        </div>
+
+        <div class="profile-field">
+          <span>Account Role</span>
+          <strong id="profile-role-detail">—</strong>
+        </div>
+
+        <div class="profile-field">
+          <span>Account Status</span>
+          <strong id="profile-status">—</strong>
+        </div>
+
+        <div class="profile-field">
+          <span>Member Since</span>
+          <strong id="profile-created">—</strong>
+        </div>
+
+      </div>
+
+      <div class="profile-security">
+
+        <div>
+          <h3>Account Security</h3>
+          <p class="muted">
+            Keep your account secure by updating
+            your password when necessary.
+          </p>
+        </div>
+
+        <a
+          href="change-password.html"
+          class="btn"
+        >
+          Change Password
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/profile.js"></script>
+
+</body>
+</html>

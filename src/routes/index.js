@@ -14,7 +14,7 @@ router.use(require('./quiz'));
 router.use(require('./assignment'));
 router.use(require('./discussion'));
 router.use(require('./adaptive'));
-router.use(require('./enrollment'));
+router.use(require('./enrollments'));
 router.use(require('./answer'));
 
 module.exports = router;

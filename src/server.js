@@ -12,21 +12,39 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(cors(config.corsOrigins.length ? { origin: config.corsOrigins } : undefined));
+app.use(
+  cors(
+    config.corsOrigins.length
+      ? { origin: config.corsOrigins }
+      : undefined
+  )
+);
+
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '..', 'public')));
 
+const publicPath = path.join(__dirname, '..', 'public');
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(publicPath, 'index.html'));
+});
+
+app.use(express.static(publicPath));
 app.use('/api', routes);
-
 app.use('/api', notFound);
 app.use(errorHandler);
 
 if (require.main === module) {
-  const useHttps = Boolean(config.https.keyPath && config.https.certPath);
+  const useHttps = Boolean(
+    config.https.keyPath && config.https.certPath
+  );
+
   let server;
   if (useHttps) {
     server = https.createServer(
-      { key: fs.readFileSync(config.https.keyPath), cert: fs.readFileSync(config.https.certPath) },
+      {
+        key: fs.readFileSync(config.https.keyPath),
+        cert: fs.readFileSync(config.https.certPath),
+      },
       app
     );
   } else {
@@ -34,12 +52,22 @@ if (require.main === module) {
   }
 
   db.query('SELECT 1')
-    .then(() => console.log(`[db] Connected to ${config.db.database} on ${config.db.host}:${config.db.port}`))
-    .catch((err) => console.error('[db] Connection FAILED:', err.message))
-    .finally(() => {
-      server.listen(config.port, () =>
-        console.log(`Server running at ${useHttps ? 'https' : 'http'}://localhost:${config.port}`)
+    .then(() => {
+      console.log(
+        `[db] Connected to ${config.db.database} on ${config.db.host}:${config.db.port}`
       );
+    })
+    .catch((err) => {
+      console.error('[db] Connection FAILED:', err.message);
+    })
+    .finally(() => {
+      server.listen(config.port, () => {
+        console.log(
+          `Server running at ${
+            useHttps ? 'https' : 'http'
+          }://localhost:${config.port}`
+        );
+      });
     });
 }
 

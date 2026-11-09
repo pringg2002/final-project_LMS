@@ -10,24 +10,15 @@ const AppError = require('../utils/AppError');
 const LESSON_STATUSES = ['draft', 'published'];
 const RESOURCE_TYPES = ['pdf', 'video', 'link', 'document'];
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/feature/Mark-lessons
 function assertSafeUrl(url) {
   if (typeof url !== 'string' || url.length > 500 || !/^(https?:\/\/|\/)/i.test(url.trim())) {
     throw new AppError('resource_url must start with http://, https:// or / (max 500 chars)', 400);
   }
 }
 
-<<<<<<< HEAD
-async function listByModule(moduleId, user) {
-  await moduleService.getById(moduleId, user);
-=======
 
 async function listByModule(moduleId, user) {
   await moduleService.getById(moduleId, user); 
->>>>>>> origin/feature/Mark-lessons
   return lessonModel.findByModule(moduleId, { publishedOnly: !access.isStaff(user) });
 }
 
@@ -36,10 +27,7 @@ async function getById(lessonId, user) {
   if (!lesson) throw new AppError('Lesson not found', 404);
   await moduleService.getById(lesson.module_id, user);
   if (lesson.status !== 'published' && !access.isStaff(user)) throw new AppError('Lesson not found', 404);
-<<<<<<< HEAD
-=======
   
->>>>>>> origin/feature/Mark-lessons
   await adaptiveService.assertModuleAccess(user, lesson.module_id);
   return lesson;
 }
@@ -85,11 +73,7 @@ async function remove(lessonId, user) {
 
 
 const listResources = async (lessonId, user) => {
-<<<<<<< HEAD
-  await getById(lessonId, user);
-=======
   await getById(lessonId, user); 
->>>>>>> origin/feature/Mark-lessons
   return resourceModel.findByLesson(lessonId);
 };
 
