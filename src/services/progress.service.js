@@ -7,6 +7,10 @@ const AppError = require('../utils/AppError');
 
 const STATUSES = ['not_started', 'in_progress', 'completed'];
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/feature/Mark-lessons
 function normalize({ status, progress_percent }) {
   let pct = progress_percent === undefined ? undefined : Number(progress_percent);
   let st = status;
@@ -16,13 +20,21 @@ function normalize({ status, progress_percent }) {
   return { status: st, progress_percent: pct };
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/feature/Mark-lessons
 async function record(body, user) {
   requireFields(body, ['lesson_id']);
   assertEnum(body.status, STATUSES, 'status');
   assertNumber(body.progress_percent, 'progress_percent', { min: 0, max: 100 });
 
   const lessonId = parseId(body.lesson_id, 'lesson_id');
+<<<<<<< HEAD
   const lesson = await lessonService.getById(lessonId, user);
+=======
+  const lesson = await lessonService.getById(lessonId, user); // visibility check
+>>>>>>> origin/feature/Mark-lessons
   const next = normalize(body);
   const existing = await progressModel.findByStudentLesson(user.user_id, lessonId);
 
@@ -38,6 +50,10 @@ async function record(body, user) {
     return { progress: await progressModel.findById(id), lesson };
   }
 
+<<<<<<< HEAD
+=======
+  
+>>>>>>> origin/feature/Mark-lessons
   if (existing.status === 'completed') {
     await progressModel.update(existing.progress_id, { last_accessed_at: new Date() });
     return { progress: await progressModel.findById(existing.progress_id), lesson };
