@@ -1,15 +1,5 @@
 const authService = require('../services/auth.service');
-const { success, created } = require('../utils/response');
-
-exports.register = async (req, res) => {
-  const data = await authService.register(req.body);
-
-  created(
-    res,
-    data,
-    'Registered successfully'
-  );
-};
+const { success } = require('../utils/response');
 
 exports.login = async (req, res) => {
   const data = await authService.login(req.body);

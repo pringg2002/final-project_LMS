@@ -64,7 +64,7 @@ const login = async (email) => {
   const { admin, ian, stella, mia, noah, liam } = tokens;
 
   await check('POST /api/auth/login (wrong password -> 401)', 'POST', '/api/auth/login', 401, { body: { email: 'admin@lms.test', password: 'wrong' } });
-  await check('POST /api/auth/register (missing fields -> 400)', 'POST', '/api/auth/register', 400, { body: { email: 'x@y.z' } });
+  await check('POST /api/auth/register (disabled -> 404)', 'POST', '/api/auth/register', 404, { body: { email: 'x@y.z' } });
   await check('GET  /api/auth/me', 'GET', '/api/auth/me', 200, { token: mia });
   await check('GET  /api/auth/me (no token -> 401)', 'GET', '/api/auth/me', 401);
   await check('GET  /api/auth/me (bad token -> 401)', 'GET', '/api/auth/me', 401, { token: 'not.a.token' });

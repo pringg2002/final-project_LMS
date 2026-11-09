@@ -8,6 +8,20 @@ const $ = id => document.getElementById(id);
 const me = getUser() || {};
 const fmt = x => esc(x ?? '');
 
+const middleNameInput = $('middle-name');
+const noMiddleNameCheckbox = $('no-middle-name');
+
+if (middleNameInput && noMiddleNameCheckbox) {
+  noMiddleNameCheckbox.addEventListener('change', () => {
+    if (noMiddleNameCheckbox.checked) {
+      middleNameInput.value = '';
+      middleNameInput.disabled = true;
+    } else {
+      middleNameInput.disabled = false;
+    }
+  });
+}
+
 async function loadManageData() {
   if (getUser()?.role !== 'admin') return;
   const [users, courses, enrollments] = await Promise.all([
@@ -186,6 +200,7 @@ async function adminRequest(path, method, body, message) {
   }
 }
 
+
 $('create-user-form').addEventListener('submit', async e => {
   e.preventDefault();
 
@@ -195,9 +210,15 @@ $('create-user-form').addEventListener('submit', async e => {
   resultBox.hidden = true;
 
   try {
+    const data = Object.fromEntries(new FormData(form));
+
+    data.middle_name = noMiddleNameCheckbox?.checked
+      ? null
+      : String(data.middle_name || '').trim() || null;
+
     const created = await api('/api/users', {
       method: 'POST',
-      body: Object.fromEntries(new FormData(form))
+      body: data
     });
 
     if (!created?.temporary_password) {
@@ -218,6 +239,12 @@ $('create-user-form').addEventListener('submit', async e => {
     );
 
     form.reset();
+
+    if (middleNameInput) {
+      middleNameInput.disabled = false;
+      middleNameInput.value = '';
+    }
+
     await loadManageData();
 
   } catch (error) {

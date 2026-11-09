@@ -6,6 +6,7 @@ const PUBLIC_SELECT = `
     u.role_id,
     r.role_name AS role,
     u.first_name,
+    u.middle_name,
     u.last_name,
     u.email,
     u.status,
@@ -13,13 +14,15 @@ const PUBLIC_SELECT = `
     u.created_at,
     u.updated_at
   FROM users u
-  INNER JOIN roles r ON r.role_id = u.role_id
+  INNER JOIN roles r
+    ON r.role_id = u.role_id
 `;
 
 async function findAll() {
   const [rows] = await db.query(
     `${PUBLIC_SELECT} ORDER BY u.user_id`
   );
+
   return rows;
 }
 
@@ -42,7 +45,7 @@ async function findStudentsByInstructor(instructorId) {
       AND EXISTS (
         SELECT 1
         FROM enrollments e
-        JOIN courses c
+        INNER JOIN courses c
           ON c.course_id = e.course_id
         WHERE e.student_id = u.user_id
           AND c.instructor_id = ?
@@ -70,6 +73,7 @@ async function findByEmailWithPassword(email) {
       u.role_id,
       r.role_name AS role,
       u.first_name,
+      u.middle_name,
       u.last_name,
       u.email,
       u.password_hash,
@@ -77,7 +81,8 @@ async function findByEmailWithPassword(email) {
       u.must_change_password,
       u.token_version
     FROM users u
-    INNER JOIN roles r ON r.role_id = u.role_id
+    INNER JOIN roles r
+      ON r.role_id = u.role_id
     WHERE u.email = ?
   `, [email]);
 
@@ -101,6 +106,7 @@ async function findByIdWithPassword(userId) {
 async function create({
   role_id,
   first_name,
+  middle_name = null,
   last_name,
   email,
   password_hash,
@@ -111,16 +117,18 @@ async function create({
     INSERT INTO users (
       role_id,
       first_name,
+      middle_name,
       last_name,
       email,
       password_hash,
       status,
       must_change_password
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     role_id,
     first_name,
+    middle_name,
     last_name,
     email,
     password_hash,
@@ -134,6 +142,7 @@ async function create({
 const UPDATABLE = [
   'role_id',
   'first_name',
+  'middle_name',
   'last_name',
   'email',
   'password_hash',
@@ -147,16 +156,20 @@ async function update(userId, fields) {
     key => UPDATABLE.includes(key)
   );
 
-  if (!keys.length) return 0;
+  if (!keys.length) {
+    return 0;
+  }
 
   const setClause = keys
     .map(key => `${key} = ?`)
     .join(', ');
 
   const [result] = await db.query(
-    `UPDATE users
-     SET ${setClause}
-     WHERE user_id = ?`,
+    `
+      UPDATE users
+      SET ${setClause}
+      WHERE user_id = ?
+    `,
     [
       ...keys.map(key => fields[key]),
       userId
@@ -179,8 +192,11 @@ async function getUsersWithRolesReport() {
   const [rows] = await db.query(`
     SELECT
       u.user_id,
-      CONCAT(
-        u.first_name, ' ', u.last_name
+      CONCAT_WS(
+        ' ',
+        u.first_name,
+        NULLIF(u.middle_name, ''),
+        u.last_name
       ) AS full_name,
       u.email,
       r.role_name AS role,

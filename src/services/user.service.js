@@ -95,9 +95,15 @@ async function create(body) {
     );
   }
 
+  const middleName =
+    typeof body.middle_name === 'string'
+      ? body.middle_name.trim() || null
+      : null;
+
   const id = await userModel.create({
     role_id,
     first_name: body.first_name.trim(),
+    middle_name: middleName,
     last_name: body.last_name.trim(),
     email: body.email.trim().toLowerCase(),
     password_hash: await hashPassword(temporaryPassword),
@@ -124,6 +130,13 @@ async function update(id, body, actor) {
 
   if (body.first_name !== undefined) {
     fields.first_name = String(body.first_name).trim();
+  }
+
+  if (body.middle_name !== undefined) {
+    fields.middle_name =
+      body.middle_name === null
+        ? null
+        : String(body.middle_name).trim() || null;
   }
 
   if (body.last_name !== undefined) {
@@ -194,7 +207,10 @@ async function update(id, body, actor) {
   }
 
   if (!Object.keys(fields).length) {
-    throw new AppError('No valid fields to update', 400);
+    throw new AppError(
+      'No valid fields to update',
+      400
+    );
   }
 
   await userModel.update(id, fields);
@@ -229,7 +245,10 @@ async function resetPassword(id, password, actor) {
   const existing = await userModel.findById(id);
 
   if (!existing) {
-    throw new AppError('User not found', 404);
+    throw new AppError(
+      'User not found',
+      404
+    );
   }
 
   await userModel.updatePassword(
@@ -255,12 +274,17 @@ async function remove(id, actor) {
   const affected = await userModel.remove(id);
 
   if (!affected) {
-    throw new AppError('User not found', 404);
+    throw new AppError(
+      'User not found',
+      404
+    );
   }
 }
 
+
 const rolesReport = () =>
   userModel.getUsersWithRolesReport();
+
 
 module.exports = {
   list,
