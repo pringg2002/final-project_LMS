@@ -1,6 +1,3 @@
-progress.service.js
-
-
 const progressModel = require('../models/progress.models');
 const lessonService = require('./lesson.service');
 const adaptiveService = require('./adaptive.service');

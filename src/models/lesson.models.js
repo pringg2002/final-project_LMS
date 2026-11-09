@@ -1,7 +1,3 @@
-lesson.models.js
-
-
-
 const db = require('../db');
 const { updateById, deleteById } = require('../utils/sql');
 

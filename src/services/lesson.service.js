@@ -1,6 +1,3 @@
-lesson.service.js
-
-
 const lessonModel = require('../models/lesson.models');
 const resourceModel = require('../models/resource.models');
 const moduleService = require('./module.service');

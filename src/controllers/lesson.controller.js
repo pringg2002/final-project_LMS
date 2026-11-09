@@ -1,6 +1,3 @@
-lesson.controller.js
-
-
 const lessonService = require('../services/lesson.service');
 const { parseId } = require('../lib/validate');
 const { success, created } = require('../utils/response');

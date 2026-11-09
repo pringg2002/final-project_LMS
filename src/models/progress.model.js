@@ -1,6 +1,3 @@
-progress.models.js
-
-
 const db = require('../db');
 const { updateById } = require('../utils/sql');
 
