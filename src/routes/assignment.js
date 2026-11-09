@@ -21,22 +21,4 @@ router.get('/submissions/:id', auth, learner, asyncHandler(controller.getSubmiss
 router.put('/submissions/:id', auth, learner, asyncHandler(controller.updateSubmission));
 router.delete('/submissions/:id', auth, learner, asyncHandler(controller.removeSubmission));
 
-<<<<<<< HEAD
-// Create a new assignment
-exports.createAssignment = (req, res) => {
-    const assignmentData = req.body;
-    
-    Assignment.create(assignmentData, (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ 
-            success: true, 
-            message: "Assignment created successfully",
-            assignmentId: results.insertId 
-        });
-    });
-};
-=======
 module.exports = router;
->>>>>>> origin/main
