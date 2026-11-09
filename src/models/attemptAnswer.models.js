@@ -17,7 +17,6 @@ async function findById(answerId) {
   return rows[0] || null;
 }
 
-// One answer per (attempt, question): saving again replaces the previous answer.
 async function upsert({ attempt_id, question_id, answer_text, is_correct, points_earned }) {
   await db.query(
     `INSERT INTO attempt_answers (attempt_id, question_id, answer_text, is_correct, points_earned)

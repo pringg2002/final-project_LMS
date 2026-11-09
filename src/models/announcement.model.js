@@ -7,7 +7,7 @@ const BASE = `
   FROM announcements a
   INNER JOIN users u ON u.user_id = a.author_id`;
 
-// visibleOnly = what a student may see: published and not expired.
+
 async function findByCourse(courseId, { visibleOnly = false } = {}) {
   const [rows] = await db.query(
     `${BASE} WHERE a.course_id = ?

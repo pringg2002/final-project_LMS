@@ -8,7 +8,7 @@ const isStaff = (user) => user.role === ROLES.ADMIN || user.role === ROLES.INSTR
 
 async function getCourseOrFail(courseId) {
   const course = await courseModel.findById(courseId);
-  if (!course) throw new AppError('Course not found', 404);
+ if (!course) throw new AppError('Course not found', 404);
   return course;
 }
 

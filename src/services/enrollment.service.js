@@ -3,7 +3,7 @@ const userModel = require('../models/user.models');
 const access = require('./access.service');
 const notificationService = require('./notification.service');
 const { ROLES } = require('../lib/roles');
-const { requireFields, assertEnum, assertNumber } = require('../lib/validate');
+const { requireFields, assertEnum, assertNumber, parseId } = require('../lib/validate');
 const AppError = require('../utils/AppError');
 
 const STATUSES = ['active', 'completed', 'dropped'];
@@ -14,7 +14,6 @@ async function list(user, { courseId } = {}) {
   return enrollmentModel.findAll({ courseId });
 }
 
-// Students may see only their own; instructors only enrollments in their courses; admins all.
 function assertCanView(enrollment, user) {
   const ok =
     user.role === ROLES.ADMIN ||
@@ -30,28 +29,22 @@ async function getById(enrollmentId, user) {
   return enrollment;
 }
 
-// Student: POST { course_id } enrolls themselves.  Staff: POST { course_id, student_id } enrolls a student.
 async function create(body, user) {
   requireFields(body, ['course_id']);
-  const course = await access.getCourseOrFail(Number(body.course_id));
+  const course = await access.getCourseOrFail(parseId(body.course_id, 'course_id'));
 
-  let studentId = user.user_id;
-  if (user.role !== ROLES.STUDENT) {
-    requireFields(body, ['student_id']);
-    await access.assertCourseManager(user, course.course_id);
-    const student = await userModel.findById(Number(body.student_id));
-    if (!student || student.role !== ROLES.STUDENT) throw new AppError('student_id must belong to a student', 400);
-    studentId = student.user_id;
-  } else if (course.status !== 'published') {
-    throw new AppError('Course not found', 404); // students cannot see unpublished courses
-  }
+  if (user.role !== ROLES.ADMIN) throw new AppError('Only admins can enroll students', 403);
+  requireFields(body, ['student_id']);
+  const student = await userModel.findById(parseId(body.student_id, 'student_id'));
+  if (!student || student.role !== ROLES.STUDENT) throw new AppError('Choose a valid student', 400);
+  const studentId = student.user_id;
 
   const existing = await enrollmentModel.findByStudentCourse(studentId, course.course_id);
   let enrollmentId;
   if (existing && existing.status !== 'dropped') {
     throw new AppError('Student is already enrolled in this course', 409);
   } else if (existing) {
-    await enrollmentModel.update(existing.enrollment_id, { status: 'active' }); // re-enroll after dropping
+    await enrollmentModel.update(existing.enrollment_id, { status: 'active' }); ng
     enrollmentId = existing.enrollment_id;
   } else {
     enrollmentId = await enrollmentModel.create({ student_id: studentId, course_id: course.course_id });
@@ -73,19 +66,11 @@ async function update(enrollmentId, body, user) {
   assertEnum(body.status, STATUSES, 'status');
   assertNumber(body.final_score, 'final_score', { min: 0, max: 100 });
 
+  if (user.role !== ROLES.ADMIN) throw new AppError('Only admins can change enrollments', 403);
   const fields = {};
-  if (user.role === ROLES.STUDENT) {
-    if (enrollment.student_id !== user.user_id) throw new AppError('You can only change your own enrollment', 403);
-    if (body.status !== 'dropped' || body.final_score !== undefined || body.completion_date !== undefined) {
-      throw new AppError('Students can only drop their own enrollment (status: "dropped")', 403);
-    }
-    fields.status = 'dropped';
-  } else {
-    await access.assertCourseManager(user, enrollment.course_id);
-    if (body.status !== undefined) fields.status = body.status;
-    if (body.final_score !== undefined) fields.final_score = body.final_score;
-    if (fields.status === 'completed') fields.completion_date = new Date().toISOString();
-  }
+  if (body.status !== undefined) fields.status = body.status;
+  if (body.final_score !== undefined) fields.final_score = body.final_score;
+  if (fields.status === 'completed') fields.completion_date = new Date();
   if (!Object.keys(fields).length) throw new AppError('No valid fields to update', 400);
 
   await enrollmentModel.update(enrollmentId, fields);
@@ -95,25 +80,15 @@ async function update(enrollmentId, body, user) {
 async function remove(enrollmentId, user) {
   const enrollment = await enrollmentModel.findById(enrollmentId);
   if (!enrollment) throw new AppError('Enrollment not found', 404);
-  await access.assertCourseManager(user, enrollment.course_id);
+  if (user.role !== ROLES.ADMIN) throw new AppError('Only admins can remove enrollments', 403);
   await enrollmentModel.remove(enrollmentId);
 }
 
-// True when the student currently has an active or completed enrollment in the course.
 async function isEnrolled(studentId, courseId) {
   const e = await enrollmentModel.findByStudentCourse(studentId, courseId);
   return !!e && e.status !== 'dropped';
 }
 
-// REPORT 6 (enrollments FULL OUTER JOIN activity, via LEFT JOIN UNION LEFT JOIN)
 const activityReport = () => enrollmentModel.getEnrollmentActivityReport();
 
-module.exports = {
-  list,
-  getById,
-  create,
-  update,
-  remove,
-  isEnrolled,
-  activityReport,
-};
+module.exports = { list, getById, create, update, remove, isEnrolled, activityReport };

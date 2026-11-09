@@ -1,22 +1,19 @@
-// Member 6 - enrollments + announcements. Mounted at "/" (full /api/... paths, auth per route).
-const express = require('express');
-const router = express.Router();
-const enrollmentController = require('../controllers/enrollmentController');
-const announcementController = require('../controllers/announcementController');
+const router = require('express').Router();
+const enrollmentController = require('../controllers/enrollment.controller');
+const announcementController = require('../controllers/announcement.controller');
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 const asyncHandler = require('../utils/asyncHandler');
 const { ROLES } = require('../lib/roles');
+
 const staff = role(ROLES.ADMIN, ROLES.INSTRUCTOR);
 
-// Enrollments (students manage their own; staff manage their courses' enrollments)
-router.get('/enrollments', auth, asyncHandler(enrollmentController.list)); // ?course_id=
+router.get('/enrollments', auth, asyncHandler(enrollmentController.list)); 
 router.get('/enrollments/:id', auth, asyncHandler(enrollmentController.get));
-router.post('/enrollments', auth, asyncHandler(enrollmentController.create));
-router.put('/enrollments/:id', auth, asyncHandler(enrollmentController.update));
-router.delete('/enrollments/:id', auth, staff, asyncHandler(enrollmentController.remove));
+router.post('/enrollments', auth, role(ROLES.ADMIN), asyncHandler(enrollmentController.create));
+router.put('/enrollments/:id', auth, role(ROLES.ADMIN), asyncHandler(enrollmentController.update));
+router.delete('/enrollments/:id', auth, role(ROLES.ADMIN), asyncHandler(enrollmentController.remove));
 
-// Announcements
 router.get('/courses/:courseId/announcements', auth, asyncHandler(announcementController.listByCourse));
 router.post('/courses/:courseId/announcements', auth, staff, asyncHandler(announcementController.createInCourse));
 router.get('/announcements/:id', auth, asyncHandler(announcementController.get));
