@@ -1,9 +1,6 @@
 function initCoursePageLessons() {
-  if (!Array.isArray(window.moduleRenderHooks)) {
-    window.moduleRenderHooks = [];
-  }
-
-  window.moduleRenderHooks.push(async (modules) => {
+  moduleRenderHooks.push(async (modules) => {
+    console.log('LESSON HOOK RUNNING:', modules.length);
     const staff = isStaffUser();
     const done = new Set();
 
@@ -142,6 +139,8 @@ function initCoursePageLessons() {
           ${createForm}
         </div>
       `);
+
+      console.log('LESSON SECTION INSERTED: ',moduleId);
     }
   });
 
