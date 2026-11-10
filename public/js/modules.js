@@ -211,10 +211,23 @@ if (isStaffUser()) {
   });
 }
 
+async function initializeCourseModules() {
+  try {
+    await loadCourse();
+    await loadModules();
+  } catch (err) {
+    showMessage(msgEl, err.message);
+  }
+}
+
 if (!courseId) {
   window.location.href = 'courses.html';
+} else if (document.readyState === 'loading') {
+  document.addEventListener(
+    'DOMContentLoaded',
+    initializeCourseModules,
+    { once: true }
+  );
 } else {
-  loadCourse()
-    .then(loadModules)
-    .catch((err) => showMessage(msgEl, err.message));
+  initializeCourseModules();
 }
