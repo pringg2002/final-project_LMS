@@ -107,7 +107,10 @@ function initCoursePageQuizzes() {
   });
 
   document.addEventListener('submit', async (e) => {
-    const form = e.target.closest('[data-quiz-form]');
+    const form = e.target.closest(
+      '[data-quiz-form]'
+    );
+
     if (!form) return;
     e.preventDefault();
 
@@ -203,15 +206,24 @@ function initQuizPage() {
   renderTopbar();
 
   const quizId = qs('id');
-  const $ = (id) => document.getElementById(id);
+
+  const $ = (id) =>
+    document.getElementById(id);
+
   const msgEl = $('msg');
   let quiz = null;
   let currentAttempt = null;
 
   async function load() {
-    quiz = await api(`/api/quizzes/${quizId}`);
+    quiz = await api(
+      `/api/quizzes/${quizId}`
+    );
+
     $('title').textContent = quiz.title;
-    $('desc').textContent = quiz.description || '';
+
+    $('desc').textContent =
+      quiz.description || '';
+
     $('meta').innerHTML = [
       `Pass: ${Number(quiz.passing_score)}%`,
 
