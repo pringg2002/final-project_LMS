@@ -24,46 +24,42 @@ function initCoursePageQuizzes() {
             <ul style="margin:6px 0 0 18px;padding:0">
               ${quizzes.map((q) => `
                 <li style="margin-bottom:10px">
-                  <div
-                    class="row"
-                    style="align-items:center;flex-wrap:wrap"
-                  >
-                    <a href="quiz.html?id=${q.quiz_id}">
-                      ${esc(q.title)}
-                    </a>
+                  <a href="quiz.html?id=${Number(q.quiz_id)}">
+                    ${esc(q.title)}
+                  </a>
 
-                    <span class="muted">
-                      (${Number(q.question_count)} questions,
-                      pass ${Number(q.passing_score)}%)
-                    </span>
+                  <span class="muted">
+                    (${Number(q.question_count)} questions,
+                    pass ${Number(q.passing_score)}%,
+                    ${q.attempt_limit == null
+                      ? 'unlimited attempts'
+                      : `${Number(q.attempt_limit)} attempt(s)`})
+                  </span>
 
-                    ${staff ? statusBadge(q.status) : ''}
+                  ${staff ? statusBadge(q.status) : ''}
 
-                    ${staff && q.status === 'draft' ? `
-                      <button
-                        type="button"
-                        class="small danger"
-                        data-delete-quiz="${q.quiz_id}"
-                        data-quiz-title="${esc(q.title)}"
-                      >
-                        Delete
-                      </button>
-                    ` : ''}
-                  </div>
+                  ${staff && q.status === 'draft' ? `
+                    <button
+                      type="button"
+                      class="small danger"
+                      data-delete-quiz="${Number(q.quiz_id)}"
+                      data-quiz-title="${esc(q.title)}"
+                    >
+                      Delete
+                    </button>
+                  ` : ''}
                 </li>
               `).join('')}
             </ul>
           ` : `
-            <div class="muted">
-              No quizzes yet.
-            </div>
+            <div class="muted">No quizzes yet.</div>
           `}
 
           ${staff ? `
             <form
               class="row"
               data-quiz-form="${m.module_id}"
-              style="margin-top:8px"
+              style="margin-top:8px;flex-wrap:wrap"
             >
               <input
                 name="title"
@@ -81,22 +77,26 @@ function initCoursePageQuizzes() {
                 style="width:90px"
               >
 
-              <select
-                name="status"
-                style="width:auto"
-              >
-                <option value="published">
-                  published
-                </option>
-                <option value="draft">
-                  draft
-                </option>
+              <label>
+                Attempt limit
+
+                <input
+                  name="attempt_limit"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value="1"
+                  required
+                  style="width:90px"
+                >
+              </label>
+
+              <select name="status" style="width:auto">
+                <option value="published">published</option>
+                <option value="draft">draft</option>
               </select>
 
-              <button
-                class="small"
-                type="submit"
-              >
+              <button class="small" type="submit">
                 Add quiz
               </button>
             </form>
@@ -113,10 +113,27 @@ function initCoursePageQuizzes() {
 
     if (!form) return;
     e.preventDefault();
+
+    const attemptLimit = Number(
+      form.elements.namedItem('attempt_limit').value
+    );
+
+    if (
+      !Number.isInteger(attemptLimit) ||
+      attemptLimit < 1
+    ) {
+      showMessage(
+        document.getElementById('msg'),
+        'Attempt limit must be at least 1.'
+      );
+      return;
+    }
+
     try {
       const body = {
-        title: form.elements.namedItem('title').value,
-        status: form.elements.namedItem('status').value
+        title: form.elements.namedItem('title').value.trim(),
+        status: form.elements.namedItem('status').value,
+        attempt_limit: attemptLimit
       };
 
       const score = form.elements.namedItem('score').value;
@@ -133,8 +150,7 @@ function initCoursePageQuizzes() {
         }
       );
 
-      window.location.href =
-        `quiz.html?id=${quiz.quiz_id}`;
+      window.location.href = `quiz.html?id=${quiz.quiz_id}`;
 
     } catch (error) {
       showMessage(
@@ -149,17 +165,12 @@ function initCoursePageQuizzes() {
       '[data-delete-quiz]'
     );
 
-    if (!button) return;
-
-    if (!isStaffUser()) return;
+    if (!button || !isStaffUser()) return;
 
     const quizId = button.dataset.deleteQuiz;
-    const quizTitle = button.dataset.quizTitle;
 
     const confirmed = confirm(
-      `Delete draft quiz "${quizTitle}"?\n\n` +
-      'This will permanently delete the quiz and its questions.\n\n' +
-      'Quizzes with student attempts cannot be deleted.'
+      `Permanently delete draft quiz "${button.dataset.quizTitle}" and its questions?`
     );
 
     if (!confirmed) return;
@@ -215,12 +226,15 @@ function initQuizPage() {
 
     $('meta').innerHTML = [
       `Pass: ${Number(quiz.passing_score)}%`,
+
       quiz.time_limit_minutes
         ? `Time limit: ${quiz.time_limit_minutes} min`
         : null,
+
       quiz.attempt_limit
         ? `Attempts allowed: ${quiz.attempt_limit}`
         : 'Unlimited attempts',
+
       `${quiz.question_count} questions`
     ]
       .filter(Boolean)
@@ -233,18 +247,234 @@ function initQuizPage() {
       `/api/modules/${quiz.module_id}`
     );
 
-    $('back').href =
-      `courses.html?id=${mod.course_id}`;
+    $('back').href = `courses.html?id=${mod.course_id}`;
 
     if (isStaffUser()) {
       $('staff-card').hidden = false;
+
+      renderQuizSettings();
+
       await loadQuestions();
+
     } else {
       $('take-card').hidden = false;
     }
 
     await loadAttempts();
   }
+
+  function renderQuizSettings() {
+    const staffCard = $('staff-card');
+
+    let panel = $('quiz-settings-panel');
+
+    if (!panel) {
+      panel = document.createElement('section');
+
+      panel.id = 'quiz-settings-panel';
+
+      panel.style.marginBottom = '18px';
+
+      staffCard.insertBefore(
+        panel,
+        staffCard.firstChild
+      );
+    }
+
+    panel.innerHTML = `
+      <h3>Edit Quiz Settings</h3>
+
+      <form id="quiz-settings-form" class="stack">
+        <label>
+          Quiz title
+
+          <input
+            name="title"
+            required
+            value="${esc(quiz.title)}"
+          >
+        </label>
+
+        <label>
+          Description
+
+          <textarea name="description">${esc(quiz.description || '')}</textarea>
+        </label>
+
+        <div class="row" style="flex-wrap:wrap">
+          <label>
+            Passing score (%)
+
+            <input
+              name="passing_score"
+              type="number"
+              min="0"
+              max="100"
+              required
+              value="${Number(quiz.passing_score)}"
+              style="width:110px"
+            >
+          </label>
+
+          <label>
+            Attempt limit
+
+            <input
+              name="attempt_limit"
+              type="number"
+              min="1"
+              step="1"
+              required
+              value="${quiz.attempt_limit == null
+                ? 1
+                : Number(quiz.attempt_limit)}"
+              style="width:110px"
+            >
+          </label>
+
+          <label>
+            Time limit (minutes, optional)
+
+            <input
+              name="time_limit_minutes"
+              type="number"
+              min="1"
+              step="1"
+              value="${quiz.time_limit_minutes == null
+                ? ''
+                : Number(quiz.time_limit_minutes)}"
+              style="width:150px"
+            >
+          </label>
+
+          <label>
+            Status
+
+            <select name="status">
+              ${['draft', 'published', 'archived'].map(
+                (status) => `
+                  <option
+                    value="${status}"
+                    ${quiz.status === status
+                      ? 'selected'
+                      : ''}
+                  >
+                    ${status}
+                  </option>
+                `
+              ).join('')}
+            </select>
+          </label>
+        </div>
+
+        <button type="submit">
+          Save Quiz Settings
+        </button>
+      </form>
+
+      <p class="muted">
+        <small>
+          Default attempt limit: 1.
+          Existing student attempts are not reset
+          when the limit changes.
+        </small>
+      </p>
+    `;
+  }
+
+  $('staff-card').addEventListener(
+    'submit',
+    async (e) => {
+      if (e.target.id !== 'quiz-settings-form') {
+        return;
+      }
+
+      e.preventDefault();
+
+      const form = e.target;
+
+      const button = form.querySelector(
+        'button[type="submit"]'
+      );
+
+      const attemptLimit = Number(
+        form.elements.namedItem('attempt_limit').value
+      );
+
+      const passingScore = Number(
+        form.elements.namedItem('passing_score').value
+      );
+
+      const timeValue = form.elements
+        .namedItem('time_limit_minutes')
+        .value.trim();
+
+      if (
+        !Number.isInteger(attemptLimit) ||
+        attemptLimit < 1 ||
+        !Number.isFinite(passingScore) ||
+        passingScore < 0 ||
+        passingScore > 100
+      ) {
+        showMessage(
+          msgEl,
+          'Enter a valid passing score and an attempt limit of at least 1.'
+        );
+
+        return;
+      }
+
+      if (
+        timeValue !== '' &&
+        (
+          !Number.isInteger(Number(timeValue)) ||
+          Number(timeValue) < 1
+        )
+      ) {
+        showMessage(
+          msgEl,
+          'Time limit must be a positive whole number.'
+        );
+
+        return;
+      }
+
+      const body = {
+        title: form.elements.namedItem('title').value.trim(),
+        description: form.elements.namedItem('description').value.trim(),
+        passing_score: passingScore,
+        attempt_limit: attemptLimit,
+        status: form.elements.namedItem('status').value
+      };
+
+      if (timeValue !== '') {
+        body.time_limit_minutes = Number(timeValue);
+      }
+
+      button.disabled = true;
+
+      try {
+        await api(`/api/quizzes/${quizId}`, {
+          method: 'PUT',
+          body
+        });
+
+        await load();
+
+        showMessage(
+          msgEl,
+          'Quiz settings saved successfully.',
+          'ok'
+        );
+
+      } catch (error) {
+        showMessage(msgEl, error.message);
+
+      } finally {
+        button.disabled = false;
+      }
+    }
+  );
 
   async function loadAttempts() {
     const rows = await api(
@@ -258,15 +488,12 @@ function initQuizPage() {
         (a) => a.status === 'graded'
       );
 
-      if (
-        gradedAttempts.length >=
-        quiz.attempt_limit
-      ) {
-        const startBtn = $('start-btn');
+      const used = gradedAttempts.length;
 
-        if (startBtn) {
-          startBtn.hidden = true;
-        }
+      const startBtn = $('start-btn');
+
+      if (used >= quiz.attempt_limit && startBtn) {
+        startBtn.hidden = true;
 
         const last = gradedAttempts[
           gradedAttempts.length - 1
@@ -278,6 +505,7 @@ function initQuizPage() {
             style="display:block"
           >
             All ${quiz.attempt_limit} attempts are used.
+
             Your last attempt
             (${Number(last.score)}%)
             is your final score.
@@ -285,6 +513,7 @@ function initQuizPage() {
         `;
       }
     }
+
     $('attempts').innerHTML = rows.length
       ? `
         <table class="list">
@@ -380,33 +609,25 @@ function initQuizPage() {
 
     form.hidden = false;
 
-    form.innerHTML = questions.map(
-      (q, i) => {
-        const questionId =
-          Number(q.question_id);
+    form.innerHTML = questions.map((q, i) => {
+      const questionId = Number(q.question_id);
+      const questionType = q.question_type;
 
-        const questionType =
-          q.question_type;
+      let answerInputs = '';
 
-        let answerInputs = '';
+      if (questionType === 'short_answer') {
+        answerInputs = `
+          <input
+            type="text"
+            name="q${questionId}"
+            placeholder="Your answer"
+            autocomplete="off"
+          >
+        `;
 
-        if (questionType === 'short_answer') {
-          answerInputs = `
-            <input
-              type="text"
-              name="q${questionId}"
-              placeholder="Your answer"
-              autocomplete="off"
-            >
-          `;
-
-        } else if (
-          questionType === 'true_false'
-        ) {
-          answerInputs = [
-            'true',
-            'false'
-          ].map((value) => `
+      } else if (questionType === 'true_false') {
+        answerInputs = ['true', 'false'].map(
+          (value) => `
             <label
               style="display:flex;gap:8px;align-items:center;margin:6px 0;color:inherit"
             >
@@ -417,64 +638,58 @@ function initQuizPage() {
                 style="width:auto"
               >
 
-              ${value === 'true'
-                ? 'True'
-                : 'False'}
+              ${value === 'true' ? 'True' : 'False'}
             </label>
-          `).join('');
+          `
+        ).join('');
 
-        } else if (
-          questionType === 'multiple_choice'
-        ) {
-          const options = Array.isArray(
-            q.options
-          ) ? q.options : [];
+      } else if (questionType === 'multiple_choice') {
+        const options = Array.isArray(q.options)
+          ? q.options
+          : [];
 
-          answerInputs = options.map(
-            (option) => `
-              <label
-                style="display:flex;gap:8px;align-items:center;margin:6px 0;color:inherit"
+        answerInputs = options.map(
+          (option) => `
+            <label
+              style="display:flex;gap:8px;align-items:center;margin:6px 0;color:inherit"
+            >
+              <input
+                type="radio"
+                name="q${questionId}"
+                value="${esc(option)}"
+                style="width:auto"
               >
-                <input
-                  type="radio"
-                  name="q${questionId}"
-                  value="${esc(option)}"
-                  style="width:auto"
-                >
 
-                ${esc(option)}
-              </label>
-            `
-          ).join('');
-        }
-
-        return `
-          <fieldset
-            style="border:1px solid var(--line);border-radius:10px;padding:12px"
-          >
-            <legend>
-              <strong>${i + 1}.</strong>
-              ${esc(q.question_text)}
-
-              <span class="muted">
-                (${Number(q.points)} pt)
-              </span>
-            </legend>
-
-            ${answerInputs}
-          </fieldset>
-        `;
+              ${esc(option)}
+            </label>
+          `
+        ).join('');
       }
-    ).join('') + `
+
+      return `
+        <fieldset
+          style="border:1px solid var(--line);border-radius:10px;padding:12px"
+        >
+          <legend>
+            <strong>${i + 1}.</strong>
+            ${esc(q.question_text)}
+
+            <span class="muted">
+              (${Number(q.points)} pt)
+            </span>
+          </legend>
+
+          ${answerInputs}
+        </fieldset>
+      `;
+    }).join('') + `
       <button type="submit">
         Submit answers
       </button>
     `;
 
     form.dataset.questions = JSON.stringify(
-      questions.map(
-        (q) => q.question_id
-      )
+      questions.map((q) => q.question_id)
     );
   }
 
@@ -501,19 +716,14 @@ function initQuizPage() {
 
           return {
             question_id: id,
-            answer_text: el
-              ? el.value
-              : ''
+            answer_text: el ? el.value : ''
           };
         })
-        .filter(
-          (a) => a.answer_text !== ''
-        );
+        .filter((a) => a.answer_text !== '');
 
-      const submitButton =
-        form.querySelector(
-          'button[type=submit]'
-        );
+      const submitButton = form.querySelector(
+        'button[type=submit]'
+      );
 
       submitButton.disabled = true;
 
@@ -541,9 +751,7 @@ function initQuizPage() {
 
         $('result').innerHTML = `
           <div
-            class="msg ${result.passed
-              ? 'ok'
-              : 'error'}"
+            class="msg ${result.passed ? 'ok' : 'error'}"
             style="display:block"
           >
             <strong>
@@ -593,10 +801,7 @@ function initQuizPage() {
       } catch (error) {
         submitButton.disabled = false;
 
-        showMessage(
-          msgEl,
-          error.message
-        );
+        showMessage(msgEl, error.message);
       }
     }
   );
@@ -628,9 +833,7 @@ function initQuizPage() {
                 : ''}
 
               Answer:
-              <strong>
-                ${esc(q.correct_answer)}
-              </strong>
+              <strong>${esc(q.correct_answer)}</strong>
             </small>
           </div>
 
@@ -648,30 +851,24 @@ function initQuizPage() {
   $('questions').addEventListener(
     'click',
     async (e) => {
-      const button = e.target.closest(
-        '[data-del-q]'
-      );
+      const button = e.target.closest('[data-del-q]');
 
       if (!button) return;
 
-      const id = button.dataset.delQ;
-
       try {
         await api(
-          `/api/questions/${id}`,
+          `/api/questions/${button.dataset.delQ}`,
           { method: 'DELETE' }
         );
 
         await loadQuestions();
 
       } catch (error) {
-        showMessage(
-          msgEl,
-          error.message
-        );
+        showMessage(msgEl, error.message);
       }
     }
   );
+
 
   function syncQuestionForm() {
     const type = $('q-type').value;
@@ -680,10 +877,8 @@ function initQuizPage() {
       type !== 'multiple_choice';
 
     $('q-answer-hint').textContent = {
-      multiple_choice:
-        '(must match one option)',
-      true_false:
-        '(true or false)',
+      multiple_choice: '(must match one option)',
+      true_false: '(true or false)',
       short_answer:
         '(use | to allow several accepted answers)'
     }[type];
@@ -706,11 +901,8 @@ function initQuizPage() {
       const body = {
         question_text: $('q-text').value,
         question_type: type,
-        points: Number(
-          $('q-points').value
-        ),
-        correct_answer:
-          $('q-answer').value
+        points: Number($('q-points').value),
+        correct_answer: $('q-answer').value
       };
 
       if (type === 'multiple_choice') {
@@ -737,10 +929,7 @@ function initQuizPage() {
         await loadQuestions();
 
       } catch (error) {
-        showMessage(
-          msgEl,
-          error.message
-        );
+        showMessage(msgEl, error.message);
       }
     }
   );
@@ -749,8 +938,7 @@ function initQuizPage() {
     window.location.href = 'courses.html';
   } else {
     load().catch(
-      (error) =>
-        showMessage(msgEl, error.message)
+      (error) => showMessage(msgEl, error.message)
     );
   }
 }
