@@ -21,15 +21,15 @@ function displayCourses(courses) {
         <div class="dashboard-course">
           <a href="courses.html?id=${Number(c.course_id)}">
             <strong>
-              ${esc(c.course_code)} —
-              ${esc(c.course_name)}
+              ${fmt(c.course_code)} —
+              ${fmt(c.course_name)}
             </strong>
           </a>
 
           <div class="muted">
             Instructor:
-            ${esc(c.instructor_name || 'Not assigned')}
-            · ${esc(c.status)}
+            ${fmt(c.instructor_name || 'Not assigned')}
+            · ${fmt(c.status)}
           </div>
         </div>
       `).join('')
@@ -73,7 +73,9 @@ async function loadDashboard() {
       stat('Enrolled Courses', courses.length) +
       stat(
         'My Enrollments',
-        enrollments.filter(e => e.status !== 'dropped').length
+        enrollments.filter(
+          e => e.status !== 'dropped'
+        ).length
       ) +
       stat('Learning', 'In progress');
 
@@ -90,16 +92,12 @@ async function loadDashboard() {
       stat('Teaching Courses', courses.length) +
       stat(
         'Enrolled Students',
-        new Set(active.map(e => e.student_id)).size
+        new Set(
+          active.map(e => e.student_id)
+        ).size
       ) +
       stat('Active Enrollments', active.length);
 
-    actions([
-      ['My Teaching Courses', 'courses.html'],
-      ['Create Announcements', 'courses.html'],
-      ['Assignments and Grading', 'assignments.html'],
-      ['Class Discussions', 'discussions.html']
-    ]);
 
     $('class-section').hidden = false;
 
@@ -126,21 +124,22 @@ async function loadDashboard() {
       `
       : '<p class="empty">No enrolled students yet.</p>';
 
-  
-} else if (role === 'admin') {
-  $('courses-title').textContent = 'All Courses';
+  } else if (role === 'admin') {
+    $('courses-title').textContent =
+      'All Courses';
 
-  const users = await api('/api/users');
+    const users = await api('/api/users');
 
-  $('dashboard-stats').innerHTML =
-    stat('Users', users.length) +
-    stat(
-      'Instructors',
-      users.filter(u => u.role === 'instructor').length
-    ) +
-    stat('Courses', courses.length);
-}
-
+    $('dashboard-stats').innerHTML =
+      stat('Users', users.length) +
+      stat(
+        'Instructors',
+        users.filter(
+          u => u.role === 'instructor'
+        ).length
+      ) +
+      stat('Courses', courses.length);
+  }
 }
 
 async function loadNotifications() {
