@@ -104,20 +104,88 @@ function initQuizPage() {
     } catch (err) { showMessage(msgEl, err.message); }
   });
 
-  function renderQuizForm(questions) {
-    const form = $('quiz-form');
-    form.hidden = false;
-    form.innerHTML = questions.map((q, i) => `
-      <fieldset style="border:1px solid var(--line);border-radius:10px;padding:12px">
-        <legend><strong>${i + 1}.</strong> ${esc(q.question_text)} <span class="muted">(${Number(q.points)} pt)</span></legend>
-        ${q.question_type === 'short_answer'
-          ? `<input name="q${q.question_id}" placeholder="Your answer" autocomplete="off">`
-          : (q.options || []).map((o) => `
-            <label style="display:flex;gap:8px;align-items:center;margin:6px 0;color:inherit">
-              <input type="radio" name="q${q.question_id}" value="${esc(o)}" style="width:auto"> ${esc(o)}</label>`).join('')}
-      </fieldset>`).join('') + '<button type="submit">Submit answers</button>';
-    form.dataset.questions = JSON.stringify(questions.map((q) => q.question_id));
-  }
+  
+function renderQuizForm(questions) {
+  const form = $('quiz-form');
+
+  form.hidden = false;
+
+  form.innerHTML = questions.map((q, i) => {
+    const questionId = Number(q.question_id);
+    const questionType = q.question_type;
+
+    let answerInputs = '';
+
+    if (questionType === 'short_answer') {
+      answerInputs = `
+        <input
+          type="text"
+          name="q${questionId}"
+          placeholder="Your answer"
+          autocomplete="off"
+        >
+      `;
+
+    } else if (questionType === 'true_false') {
+      answerInputs = ['true', 'false'].map(value => `
+        <label
+          style="display:flex;gap:8px;align-items:center;margin:6px 0;color:inherit"
+        >
+          <input
+            type="radio"
+            name="q${questionId}"
+            value="${value}"
+            style="width:auto"
+          >
+          ${value === 'true' ? 'True' : 'False'}
+        </label>
+      `).join('');
+
+    } else if (questionType === 'multiple_choice') {
+      const options = Array.isArray(q.options)
+        ? q.options
+        : [];
+
+      answerInputs = options.map(option => `
+        <label
+          style="display:flex;gap:8px;align-items:center;margin:6px 0;color:inherit"
+        >
+          <input
+            type="radio"
+            name="q${questionId}"
+            value="${esc(option)}"
+            style="width:auto"
+          >
+          ${esc(option)}
+        </label>
+      `).join('');
+    }
+
+    return `
+      <fieldset
+        style="border:1px solid var(--line);border-radius:10px;padding:12px"
+      >
+        <legend>
+          <strong>${i + 1}.</strong>
+          ${esc(q.question_text)}
+          <span class="muted">
+            (${Number(q.points)} pt)
+          </span>
+        </legend>
+
+        ${answerInputs}
+      </fieldset>
+    `;
+  }).join('') + `
+    <button type="submit">
+      Submit answers
+    </button>
+  `;
+
+  form.dataset.questions = JSON.stringify(
+    questions.map(q => q.question_id)
+  );
+}
 
   $('quiz-form').addEventListener('submit', async (e) => {
     e.preventDefault();
