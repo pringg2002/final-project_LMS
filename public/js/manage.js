@@ -165,6 +165,15 @@ function initializeAdmin(users, courses, enrollments) {
             <td>${fmt(e.status)}</td>
 
             <td>
+
+            <button
+                class="small secondary"
+                data-edit-enrollment="${Number(e.enrollment_id)}"
+                data-current-status="${e.status}"
+              >
+                Edit Status
+              </button>
+
               <button
                 class="small secondary"
                 data-drop-enrollment="${Number(e.enrollment_id)}"
@@ -358,18 +367,46 @@ $('admin-course-list').addEventListener('submit', async e => {
 });
 
 $('admin-enrollments').addEventListener('click', async e => {
-  const button = e.target.closest(
-    '[data-drop-enrollment]'
-  );
+  const editButton = e.target.closest('[data-edit-enrollment]');
 
-  if (!button) return;
+  if (editButton) {
+    const enrollmentId = Number(editButton.dataset.editEnrollment);
+    const currentStatus = editButton.dataset.currentStatus;
 
-  if (!confirm('Drop this enrollment?')) {
+    const newStatus = prompt(
+      'Enter enrollment status (active or dropped):',
+      currentStatus
+    );
+
+    if (newStatus === null) return;
+
+    const status = newStatus.trim().toLowerCase();
+
+    if (!['active', 'dropped'].includes(status)) {
+      alert('Please enter active or dropped.');
+      return;
+    }
+
+    if (status === currentStatus) return;
+
+    await adminRequest(
+      `/api/enrollments/${enrollmentId}`,
+      'PUT',
+      { status },
+      'Enrollment status updated successfully.'
+    );
+
     return;
   }
 
+  const dropButton = e.target.closest('[data-drop-enrollment]');
+
+  if (!dropButton) return;
+
+  if (!confirm('Drop this enrollment?')) return;
+
   await adminRequest(
-    `/api/enrollments/${button.dataset.dropEnrollment}`,
+    `/api/enrollments/${dropButton.dataset.dropEnrollment}`,
     'PUT',
     { status: 'dropped' },
     'Enrollment dropped.'
