@@ -65,20 +65,55 @@ async function loadDashboard() {
 
   displayCourses(courses);
 
-  if (role === 'student') {
-    $('courses-title').textContent =
-      'My Enrolled Courses';
+  
+if (role === 'student') {
+  $('courses-title').textContent =
+    'My Enrolled Courses';
 
-    $('dashboard-stats').innerHTML =
-      stat('Enrolled Courses', courses.length) +
-      stat(
-        'My Enrollments',
-        enrollments.filter(
-          e => e.status !== 'dropped'
-        ).length
-      ) +
-      stat('Learning', 'In progress');
+  const myEnrollments = enrollments.filter(
+    e => e.status !== 'dropped'
+  ).length;
 
+  let totalLessons = 0;
+  let completedLessons = 0;
+  let progressError = false;
+
+  const progressResults = await Promise.allSettled(
+    courses.map(course =>
+      api(`/api/courses/${course.course_id}/progress`)
+    )
+  );
+
+  for (const result of progressResults) {
+    if (result.status === 'rejected') {
+      console.error('Unable to load course progress:', result.reason);
+      progressError = true;
+      continue;
+    }
+
+    const modules = result.value;
+
+    if (!Array.isArray(modules)) {
+      progressError = true;
+      continue;
+    }
+
+    for (const module of modules) {
+      totalLessons += Number(module.lessons_total ?? 0);
+      completedLessons += Number(module.lessons_completed ?? 0);
+    }
+  }
+
+  const learningProgress = progressError
+    ? 'Unavailable'
+    : totalLessons > 0
+      ? `${Math.round((completedLessons / totalLessons) * 100)}%`
+      : '0%';
+
+  $('dashboard-stats').innerHTML =
+    stat('Enrolled Courses', courses.length) +
+    stat('My Enrollments', myEnrollments) +
+    stat('Learning Progress', learningProgress);
 
   } else if (role === 'instructor') {
     $('courses-title').textContent =
