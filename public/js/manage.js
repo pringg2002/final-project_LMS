@@ -374,7 +374,7 @@ $('admin-enrollments').addEventListener('click', async e => {
     const currentStatus = editButton.dataset.currentStatus;
 
     const newStatus = prompt(
-      'Enter enrollment status (active or dropped):',
+      'Enter enrollment status (active or completed):',
       currentStatus
     );
 
@@ -382,8 +382,8 @@ $('admin-enrollments').addEventListener('click', async e => {
 
     const status = newStatus.trim().toLowerCase();
 
-    if (!['active', 'dropped'].includes(status)) {
-      alert('Please enter active or dropped.');
+    if (!['active', 'completed'].includes(status)) {
+      alert('Please enter active or completed.');
       return;
     }
 
