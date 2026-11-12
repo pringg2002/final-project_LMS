@@ -148,45 +148,79 @@ function initializeAdmin(users, courses, enrollments) {
     `
     : '<p class="empty">No courses.</p>';
 
-  $('admin-enrollments').innerHTML = enrollments.length
-    ? `
-      <table class="list">
-        <tr>
-          <th>Student</th>
-          <th>Course</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
+  // Group students by course
+const groupedEnrollments = {};
 
-        ${enrollments.map(e => `
-          <tr>
-            <td>${fmt(e.student_name)}</td>
-            <td>${fmt(e.course_code)}</td>
-            <td>${fmt(e.status)}</td>
+enrollments.forEach(e => {
+  const courseKey = String(e.course_id ?? e.course_code);
 
-            <td>
+  if (!groupedEnrollments[courseKey]) {
+    groupedEnrollments[courseKey] = {
+      courseCode: e.course_code || 'Unknown Course',
+      students: []
+    };
+  }
 
-            <button
-                class="small secondary"
-                data-edit-enrollment="${Number(e.enrollment_id)}"
-                data-current-status="${e.status}"
-              >
-                Edit Status
-              </button>
+  groupedEnrollments[courseKey].students.push(e);
+});
 
-              <button
-                class="small secondary"
-                data-drop-enrollment="${Number(e.enrollment_id)}"
-              >
-                ${e.status === 'dropped'
-                  ? 'Dropped'
-                  : 'Drop'}
-              </button>
-            </td>
-          </tr>
-        `).join('')}
-      </table>
-    `
+$('admin-enrollments').innerHTML =
+  Object.values(groupedEnrollments).length
+    ? Object.values(groupedEnrollments)
+        .sort((a, b) =>
+          a.courseCode.localeCompare(b.courseCode)
+        )
+        .map(group => `
+          <section class="enrollment-course-group">
+
+            <div class="enrollment-course-header">
+              <h3>${fmt(group.courseCode)}</h3>
+              <span>
+                ${group.students.length}
+                student${group.students.length === 1 ? '' : 's'}
+              </span>
+            </div>
+
+            <table class="list">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${group.students.map(e => `
+                  <tr>
+                    <td>${fmt(e.student_name)}</td>
+                    <td>${fmt(e.status)}</td>
+
+                    <td>
+                      <button
+                        class="small secondary"
+                        data-edit-enrollment="${Number(e.enrollment_id)}"
+                        data-current-status="${fmt(e.status)}"
+                      >
+                        Edit Status
+                      </button>
+
+                      <button
+                        class="small secondary"
+                        data-drop-enrollment="${Number(e.enrollment_id)}"
+                      >
+                        ${e.status === 'dropped'
+                          ? 'Dropped'
+                          : 'Drop'}
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+
+          </section>
+        `).join('')
     : '<p class="empty">No enrollments.</p>';
 }
 

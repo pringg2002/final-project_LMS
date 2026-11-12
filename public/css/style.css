@@ -1032,3 +1032,37 @@ body.login-page {
   font-weight: 500;
   cursor: pointer;
 }
+
+.enrollment-course-group {
+  margin-bottom: 24px;
+  border: 1px solid #d9e4f5;
+  border-radius: 12px;
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.enrollment-course-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #f1f6ff;
+  border-bottom: 1px solid #d9e4f5;
+}
+
+.enrollment-course-header h3 {
+  margin: 0;
+  color: #103b82;
+  font-size: 17px;
+}
+
+.enrollment-course-header span {
+  color: #58749c;
+  font-size: 13px;
+}
+
+.enrollment-course-group .list {
+  width: 100%;
+  margin: 0;
+}
